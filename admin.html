@@ -508,6 +508,12 @@ let products = [];
 let currentImageFile = null;
 let currentImageURL = null;
 
+// XSS prevention: escape HTML entities
+function esc(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // ===== AUTH =====
 onAuthStateChanged(auth, user => {
   if (user) {
@@ -597,7 +603,7 @@ function renderCategories() {
               <button class="reorder-btn" onclick="event.stopPropagation();moveCat('${cat.id}',1)" ${isLast ? 'disabled' : ''}>▼</button>
             </div>
             <div>
-              <span class="cat-card-title">${cat.title}</span>
+              <span class="cat-card-title">${esc(cat.title)}</span>
               <span class="cat-card-count">(${catProds.length} items)</span>
               ${isHidden ? '<span class="cat-hidden-badge">숨김</span>' : ''}
             </div>
@@ -625,14 +631,14 @@ function renderProdRow(p) {
   return `
     <div class="prod-row">
       <div class="prod-thumb">
-        ${p.image ? `<img src="${p.image}">` : '<span class="prod-thumb-empty">📷</span>'}
+        ${p.image ? `<img src="${esc(p.image)}">` : '<span class="prod-thumb-empty">📷</span>'}
       </div>
       <div class="prod-info">
         <div class="prod-name">
-          ${p.name}
-          ${tagLabel ? `<span class="prod-tag ${tagClass}">${tagLabel}</span>` : ''}
+          ${esc(p.name)}
+          ${tagLabel ? `<span class="prod-tag ${tagClass}">${esc(tagLabel)}</span>` : ''}
         </div>
-        <div class="prod-meta">${p.korean || ''} ${p.description ? '— ' + p.description.substring(0, 60) + '...' : ''}</div>
+        <div class="prod-meta">${esc(p.korean || '')} ${p.description ? '— ' + esc(p.description.substring(0, 60)) + '...' : ''}</div>
       </div>
       <div class="prod-price">${prices}</div>
       <div class="prod-actions">
@@ -1023,9 +1029,9 @@ function renderMembers() {
       <div class="member-row">
         <div class="member-avatar">${initial}</div>
         <div class="member-info">
-          <div class="member-name">${m.name || 'Unknown'}</div>
-          <div class="member-email">${m.email || ''}</div>
-          ${m.phone ? `<div class="member-phone">📱 ${m.phone}</div>` : ''}
+          <div class="member-name">${esc(m.name || 'Unknown')}</div>
+          <div class="member-email">${esc(m.email || '')}</div>
+          ${m.phone ? `<div class="member-phone">📱 ${esc(m.phone)}</div>` : ''}
           <div class="member-date">가입: ${date}</div>
         </div>
         <div class="member-points">
@@ -1101,11 +1107,11 @@ window.showPtsHistory = (uid) => {
       const db2 = b.date?.toDate ? b.date.toDate() : new Date(0);
       return db2 - da;
     });
-    el.innerHTML = `<p style="font-weight:600;margin-bottom:8px;">${m.name || m.email} — 현재 ${m.points || 0}P</p>` +
+    el.innerHTML = `<p style="font-weight:600;margin-bottom:8px;">${esc(m.name || m.email)} — 현재 ${m.points || 0}P</p>` +
       sorted.map(h => {
         const date = h.date?.toDate ? h.date.toDate().toLocaleDateString('ko-KR') : '';
         const isPos = h.amount > 0;
-        return `<div class="pts-history-item"><div><div>${h.description}</div><div style="font-size:11px;color:var(--text3);">${date}</div></div><div class="${isPos?'pts-pos':'pts-neg'}">${isPos?'+':''}${h.amount}P</div></div>`;
+        return `<div class="pts-history-item"><div><div>${esc(h.description)}</div><div style="font-size:11px;color:var(--text3);">${date}</div></div><div class="${isPos?'pts-pos':'pts-neg'}">${isPos?'+':''}${h.amount}P</div></div>`;
       }).join('');
   }
   document.getElementById('ptsHistoryModal').classList.add('open');

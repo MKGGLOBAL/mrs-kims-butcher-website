@@ -599,7 +599,7 @@ body { font-family: var(--font-body); background: var(--bg-primary); color: var(
       <div class="auth-bonus">🎉 Sign up now and get <strong>100 bonus points (A$5 value)</strong>!</div>
       <div class="auth-field"><label>Name</label><input type="text" id="regName" placeholder="Your name"></div>
       <div class="auth-field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
-      <div class="auth-field"><label>Password</label><input type="password" id="regPassword" placeholder="Min 6 characters"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="regPassword" placeholder="Min 8 chars, letters + numbers"></div>
       <div class="auth-field"><label>Phone (optional)</label><input type="tel" id="regPhone" placeholder="04xx xxx xxx"></div>
       <button class="auth-submit" onclick="doRegister()" id="regBtn">Create Account</button>
     </div>
@@ -633,6 +633,12 @@ const auth = getAuth(app);
 
 let menuData = [], cart = [], currentItem = null, selectedSizeIdx = 0, currentUser = null;
 
+// XSS prevention: escape HTML entities
+function esc(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // ===== LOAD MENU =====
 async function loadMenu() {
   try {
@@ -647,24 +653,24 @@ async function loadMenu() {
   } catch (err) { console.error(err); showError('Could not load menu. Please try again.'); }
 }
 
-function showError(msg) { hideLoading(); document.getElementById('menuContent').innerHTML = `<div class="error-state"><h2>Oops!</h2><p>${msg}</p><button onclick="location.reload()">Retry</button></div>`; }
+function showError(msg) { hideLoading(); document.getElementById('menuContent').innerHTML = `<div class="error-state"><h2>Oops!</h2><p>${esc(msg)}</p><button onclick="location.reload()">Retry</button></div>`; }
 function hideLoading() { const el = document.getElementById('loadingScreen'); el.classList.add('fade-out'); setTimeout(() => el.remove(), 500); }
 
 function renderNav() {
   const nav = document.getElementById('navInner');
   const userHTML = nav.querySelector('.user-dropdown').outerHTML;
   const cartHTML = nav.querySelector('.cart-btn').outerHTML;
-  nav.innerHTML = menuData.map((c, i) => `<a href="#${c.id}" class="nav-link ${i===0?'active':''}">${c.navLabel || c.title}</a>`).join('') + userHTML + cartHTML;
+  nav.innerHTML = menuData.map((c, i) => `<a href="#${esc(c.id)}" class="nav-link ${i===0?'active':''}">${esc(c.navLabel || c.title)}</a>`).join('') + userHTML + cartHTML;
 }
 
 function renderMenu() {
   document.getElementById('menuContent').innerHTML = menuData.map(cat => `
-    <section class="category-section reveal" id="${cat.id}">
+    <section class="category-section reveal" id="${esc(cat.id)}">
       <div class="category-header">
-        <h2 class="category-title">${cat.title}</h2>
+        <h2 class="category-title">${esc(cat.title)}</h2>
         <span class="category-count">${cat.items.length} item${cat.items.length>1?'s':''}</span>
       </div>
-      ${cat.description ? `<p class="category-desc">${cat.description}</p>` : ''}
+      ${cat.description ? `<p class="category-desc">${esc(cat.description)}</p>` : ''}
       <div class="product-grid">${cat.items.map(renderCard).join('')}</div>
     </section>
   `).join('');
@@ -683,18 +689,18 @@ function renderCard(item) {
     : item.tag === 'new' ? '<span class="product-tag tag-new">New</span>'
     : item.tag === 'best' ? '<span class="product-tag tag-best">Best Value</span>' : '';
   const imgHTML = item.image
-    ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+    ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy">`
     : `<div class="product-img-placeholder"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Photo coming soon</span></div>`;
   const safeData = encodeURIComponent(JSON.stringify(item));
   const btnHTML = item.soldOut
     ? `<button class="add-btn soldout" disabled>Sold Out</button>`
     : `<button class="add-btn" data-item="${safeData}" onclick="window._addClick(this)"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Add</button>`;
-  return `<div class="product-card"><div class="product-img-wrap">${imgHTML}${tagHTML}</div><div class="product-info"><div class="product-name">${item.name}</div>${item.korean?`<div class="product-korean">${item.korean}</div>`:''}<p class="product-desc">${item.description||''}</p><div class="product-bottom"><div class="product-price">${priceDisplay}</div>${btnHTML}</div></div></div>`;
+  return `<div class="product-card"><div class="product-img-wrap">${imgHTML}${tagHTML}</div><div class="product-info"><div class="product-name">${esc(item.name)}</div>${item.korean?`<div class="product-korean">${esc(item.korean)}</div>`:''}<p class="product-desc">${esc(item.description||'')}</p><div class="product-bottom"><div class="product-price">${priceDisplay}</div>${btnHTML}</div></div></div>`;
 }
 
 // ===== CART =====
 window._addClick = btn => { const item = JSON.parse(decodeURIComponent(btn.dataset.item)); if (item.prices?.length > 1) { openSizeModal(item); } else { addToCart(item, 0); showToast(`${item.name} added to cart`); } };
-function openSizeModal(item) { currentItem = item; selectedSizeIdx = 0; document.getElementById('modalTitle').textContent = item.name; document.getElementById('modalKorean').textContent = item.korean || ''; document.getElementById('sizeOptions').innerHTML = item.prices.map((p, i) => `<div class="size-option ${i===0?'selected':''}" onclick="window._selSize(${i})"><span class="size-name">${p.label}</span><span class="size-price">A$${p.price.toFixed(2)}</span></div>`).join(''); document.getElementById('sizeModal').classList.add('open'); }
+function openSizeModal(item) { currentItem = item; selectedSizeIdx = 0; document.getElementById('modalTitle').textContent = item.name; document.getElementById('modalKorean').textContent = item.korean || ''; document.getElementById('sizeOptions').innerHTML = item.prices.map((p, i) => `<div class="size-option ${i===0?'selected':''}" onclick="window._selSize(${i})"><span class="size-name">${esc(p.label)}</span><span class="size-price">A$${p.price.toFixed(2)}</span></div>`).join(''); document.getElementById('sizeModal').classList.add('open'); }
 window._selSize = idx => { selectedSizeIdx = idx; document.querySelectorAll('.size-option').forEach((el,i)=>el.classList.toggle('selected',i===idx)); };
 window.closeModal = () => { document.getElementById('sizeModal').classList.remove('open'); currentItem = null; };
 window.confirmAdd = () => { if(currentItem){ addToCart(currentItem, selectedSizeIdx); showToast(`${currentItem.name} (${currentItem.prices[selectedSizeIdx].label}) added`); window.closeModal(); } };
@@ -703,7 +709,7 @@ function updateCartUI() {
   document.getElementById('cartCount').textContent = cart.reduce((s,c)=>s+c.qty,0);
   const el = document.getElementById('cartItems');
   if(!cart.length) { el.innerHTML = `<div class="cart-empty"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><p>Your cart is empty</p></div>`; }
-  else { el.innerHTML = cart.map((c,i)=>`<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${c.name}</div><div class="cart-item-size">${c.size}</div><div class="cart-item-price">A$${(c.price*c.qty).toFixed(2)}</div></div><div class="cart-item-qty"><button class="qty-btn" onclick="window._chgQty(${i},-1)">&minus;</button><span class="qty-val">${c.qty}</span><button class="qty-btn" onclick="window._chgQty(${i},1)">+</button></div></div>`).join(''); }
+  else { el.innerHTML = cart.map((c,i)=>`<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${esc(c.name)}</div><div class="cart-item-size">${esc(c.size)}</div><div class="cart-item-price">A$${(c.price*c.qty).toFixed(2)}</div></div><div class="cart-item-qty"><button class="qty-btn" onclick="window._chgQty(${i},-1)">&minus;</button><span class="qty-val">${c.qty}</span><button class="qty-btn" onclick="window._chgQty(${i},1)">+</button></div></div>`).join(''); }
   document.getElementById('cartTotal').textContent = `A$${cart.reduce((s,c)=>s+c.price*c.qty,0).toFixed(2)}`;
 }
 window._chgQty = (i,d) => { cart[i].qty+=d; if(cart[i].qty<=0)cart.splice(i,1); updateCartUI(); };
@@ -777,7 +783,8 @@ window.doRegister = async () => {
   errEl.textContent = '';
   if (!name) { errEl.textContent = 'Please enter your name.'; return; }
   if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email.'; return; }
-  if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+  if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) { errEl.textContent = 'Password must contain both letters and numbers.'; return; }
   const btn = document.getElementById('regBtn');
   btn.disabled = true; btn.textContent = 'Creating...';
   try {
@@ -847,7 +854,7 @@ async function updateUserUI(user) {
     if (userDoc.exists()) pts = userDoc.data().points || 0;
   } catch(e) {}
   const name = user.displayName || 'Member';
-  btn.innerHTML = `👤 ${name.split(' ')[0]} <span class="points-badge">${pts}P</span>`;
+  btn.innerHTML = `👤 ${esc(name.split(' ')[0])} <span class="points-badge">${pts}P</span>`;
   document.getElementById('menuUserName').textContent = name;
   document.getElementById('menuUserEmail').textContent = user.email;
   document.getElementById('menuUserPoints').textContent = pts;
