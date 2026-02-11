@@ -715,7 +715,32 @@ function updateCartUI() {
 window._chgQty = (i,d) => { cart[i].qty+=d; if(cart[i].qty<=0)cart.splice(i,1); updateCartUI(); };
 window.openCart = () => { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('open'); document.body.style.overflow='hidden'; };
 window.closeCart = () => { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('open'); document.body.style.overflow=''; };
-window.checkout = () => { if(!cart.length)return; showToast('Checkout feature coming soon!'); };
+window.checkout = async () => {
+  if (!cart.length) return;
+  const btn = document.querySelector('.checkout-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+  try {
+    const payload = {
+      items: cart.map(c => ({ id: c.id, size: c.size, qty: c.qty })),
+      customerEmail: currentUser ? currentUser.email : null,
+      userId: currentUser ? currentUser.uid : null,
+    };
+    const res = await fetch('/.netlify/functions/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Checkout failed');
+    window.location.href = data.url;
+  } catch (err) {
+    console.error('Checkout error:', err);
+    showToast(err.message || 'Checkout failed. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Proceed to Checkout';
+  }
+};
 
 // ===== EMAIL POPUP =====
 window.closePopup = () => { document.getElementById('emailPopup').classList.remove('open'); localStorage.setItem('popupDismissed', 'true'); };

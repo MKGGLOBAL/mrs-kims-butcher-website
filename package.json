@@ -1,0 +1,9 @@
+{
+  "name": "mrs-kims-grill",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "stripe": "^17.5.0",
+    "firebase-admin": "^13.0.0"
+  }
+}

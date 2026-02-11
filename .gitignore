@@ -1,5 +1,8 @@
 # Local Netlify folder
 .netlify
 
+# Dependencies
+node_modules/
+
 # Seed tool - must not be publicly accessible (no auth, can delete entire DB)
 seed.html

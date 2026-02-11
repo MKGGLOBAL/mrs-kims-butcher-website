@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Mrs Kim's Grill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0F0E0C;
+  --bg-card: #211F1B;
+  --text-primary: #F5F0E8;
+  --text-secondary: #A69E90;
+  --text-muted: #6B6358;
+  --accent: #E85D3A;
+  --gold: #C9A96E;
+  --border: rgba(201, 169, 110, 0.08);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.container { max-width: 520px; width: 100%; text-align: center; }
+
+.loading { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 15px; color: var(--text-muted); }
+
+.confirmed { display: none; }
+.check-icon { width: 72px; height: 72px; background: rgba(39,174,96,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 36px; }
+.confirmed h1 { font-family: var(--font-display); font-size: 36px; font-weight: 500; margin-bottom: 8px; }
+.confirmed .sub { font-size: 15px; color: var(--text-secondary); margin-bottom: 28px; }
+
+.order-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: left; }
+.order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.order-item:last-child { border-bottom: none; }
+.order-item-name { color: var(--text-secondary); }
+.order-item-price { font-weight: 600; }
+.order-total { display: flex; justify-content: space-between; padding-top: 14px; margin-top: 8px; border-top: 1px solid var(--border); font-size: 18px; font-weight: 700; }
+
+.points-box { background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 14px; color: var(--gold); }
+.points-box strong { color: var(--text-primary); font-size: 18px; }
+
+.email-note { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+.back-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 600; padding: 14px 32px; border: none; border-radius: 100px; cursor: pointer; text-decoration: none; transition: all 0.3s; }
+.back-btn:hover { background: #F06E4D; transform: translateY(-2px); }
+
+.error { display: none; }
+.error h1 { font-family: var(--font-display); font-size: 28px; margin-bottom: 12px; }
+.error p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Confirming your order...</div>
+  </div>
+
+  <div class="confirmed" id="confirmed">
+    <div class="check-icon">&#10003;</div>
+    <h1>Order Confirmed!</h1>
+    <p class="sub">Thank you, <span id="customerName"></span>. Your order is being prepared.</p>
+
+    <div class="order-box">
+      <div id="orderItems"></div>
+      <div class="order-total">
+        <span>Total</span>
+        <span id="orderTotal"></span>
+      </div>
+    </div>
+
+    <div class="points-box" id="pointsBox" style="display:none;">
+      You earned <strong><span id="pointsEarned"></span> points</strong> on this order!
+    </div>
+
+    <p class="email-note">A confirmation email has been sent to <strong><span id="customerEmail"></span></strong>.</p>
+
+    <a href="index.html" class="back-btn">Continue Shopping</a>
+  </div>
+
+  <div class="error" id="error">
+    <h1>Something went wrong</h1>
+    <p id="errorMessage"></p>
+    <a href="index.html" class="back-btn">Return to Shop</a>
+  </div>
+</div>
+
+<script>
+function esc(str) {
+  if (str == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+
+  if (!sessionId) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+    document.getElementById('errorMessage').textContent = 'No session ID found.';
+    return;
+  }
+
+  try {
+    const res = await fetch('/.netlify/functions/verify-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Verification failed');
+    }
+
+    const order = data.order;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('confirmed').style.display = 'block';
+    document.getElementById('customerName').textContent = order.customerName || 'Customer';
+    document.getElementById('customerEmail').textContent = order.customerEmail || '';
+
+    document.getElementById('orderItems').innerHTML = order.items.map(item =>
+      `<div class="order-item"><span class="order-item-name">${esc(item.name)} x${item.quantity}</span><span class="order-item-price">A$${item.amountTotal.toFixed(2)}</span></div>`
+    ).join('');
+    document.getElementById('orderTotal').textContent = `A$${order.totalAmount.toFixed(2)}`;
+
+    if (order.pointsEarned) {
+      document.getElementById('pointsBox').style.display = 'block';
+      document.getElementById('pointsEarned').textContent = order.pointsEarned;
+    }
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+    document.getElementById('errorMessage').textContent = err.message;
+  }
+})();
+</script>
+</body>
+</html>
