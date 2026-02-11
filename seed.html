@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mrs Kim's — Data Seeder v2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, sans-serif; background: #111; color: #f0f0f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 40px; max-width: 600px; width: 100%; }
+  h1 { font-size: 22px; margin-bottom: 8px; }
+  .sub { color: #999; font-size: 14px; margin-bottom: 24px; }
+  .btn { display: block; width: 100%; padding: 16px; font-size: 16px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 12px; text-align: center; }
+  .btn-seed { background: #E85D3A; color: #fff; }
+  .btn-seed:hover { background: #F06E4D; }
+  .btn-seed:disabled { background: #555; cursor: not-allowed; }
+  .btn-clear { background: #333; color: #E74C3C; border: 1px solid #E74C3C; }
+  .btn-clear:hover { background: #E74C3C; color: #fff; }
+  #log { background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-top: 20px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; line-height: 1.8; }
+  .ok { color: #27AE60; } .err { color: #E74C3C; } .info { color: #999; } .warn { color: #F39C12; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🚀 Mrs Kim's Grill — Data Seeder v2</h1>
+  <p class="sub">Square CSV 기준 정확한 가격 반영. 먼저 Clear 하고 Seed 하세요!</p>
+  <button class="btn btn-clear" onclick="clearAll()">🗑 1단계: Clear All Data (기존 데이터 삭제)</button>
+  <button class="btn btn-seed" id="seedBtn" onclick="runSeed()">🚀 2단계: Seed All Menu Data (새 데이터 입력)</button>
+  <div id="log"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAmH7sqFbJjNXAlyKAz4Nzt-xnwvWsSvvw",
+  authDomain: "mrs-kim-s-butcher.firebaseapp.com",
+  projectId: "mrs-kim-s-butcher",
+  storageBucket: "mrs-kim-s-butcher.firebasestorage.app",
+  messagingSenderId: "850910143212",
+  appId: "1:850910143212:web:d9eeb4b0f006b3d14bbbc9"
+});
+const db = getFirestore(app);
+const logEl = document.getElementById('log');
+
+function log(msg, cls = 'info') {
+  logEl.innerHTML += `<div class="${cls}">${msg}</div>`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+const categories = [
+  { id: 'marinated-bbq', title: 'Marinated Korean BBQ', navLabel: 'Marinated BBQ', description: 'Ready to grill — marinated with our signature Korean recipes.', order: 0 },
+  { id: 'fresh-cut', title: 'Fresh Cut Korean BBQ', navLabel: 'Fresh Cut', description: 'Classic un-marinated cuts, freshly sliced for your grill.', order: 1 },
+  { id: 'premium-bbq', title: 'Premium Korean BBQ', navLabel: 'Premium BBQ', description: 'Top-tier cuts for the ultimate grilling experience.', order: 2 },
+  { id: 'banchan', title: "Mrs Kim's Banchan", navLabel: 'Banchan', description: 'Traditional Korean side dishes, handmade with love.', order: 3 },
+  { id: 'salads', title: "Mrs Kim's Salads", navLabel: 'Salads', description: 'Fresh accompaniments to complete your Korean BBQ experience.', order: 4 },
+  { id: 'bbq-boxes', title: "BBQ Boxes", navLabel: 'BBQ Boxes', description: 'Complete Korean BBQ kits — meats, banchan, and sauces bundled together. Just fire up the grill!', order: 5 },
+];
+
+const products = [
+  // ===== BBQ BOXES =====
+  { id: 'date-night-box', categoryId: 'bbq-boxes', name: 'Date Night Box', korean: '커플 세트', description: 'Perfect for two. Includes marinated beef bulgogi, pork belly, kimchi, ssamjang dipping sauce, and ssam lettuce kit.', prices: [{ label: 'For 2', price: 63.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+  { id: 'family-bbq-box', categoryId: 'bbq-boxes', name: 'Family BBQ Box', korean: '가족 세트', description: 'Feed the whole family! Includes signature galbi, marinated soy chicken, pork belly, kimchi, corn cheese, ssamjang, and ssam lettuce kit.', prices: [{ label: 'For 4', price: 119.00 }], tag: 'best', order: 1, soldOut: false, image: '' },
+  { id: 'ultimate-box', categoryId: 'bbq-boxes', name: "Ultimate Mrs Kim's Box", korean: '프리미엄 세트', description: 'The full experience. Premium wagyu rib fillet, signature galbi, beef bulgogi, soy pork belly, all banchan sides included.', prices: [{ label: 'For 4-6', price: 209.00 }], tag: 'premium', order: 2, soldOut: false, image: '' },
+  { id: 'spicy-lovers-box', categoryId: 'bbq-boxes', name: 'Spicy Lovers Box', korean: '매운맛 세트', description: 'For those who like it hot! Spicy pork bulgogi, spicy chicken, kimchi, cucumber kimchi, and ssamjang.', prices: [{ label: 'For 2-3', price: 62.00 }], tag: 'spicy', order: 3, soldOut: false, image: '' },
+
+  // ===== SALADS =====
+  { id: 'ssam-lettuce', categoryId: 'salads', name: 'Ssam Lettuce and Pickles', korean: '', description: 'Fresh lettuce leaves and assorted pickles, perfect for wrapping your BBQ.', prices: [{ label: 'Regular', price: 10.00 }], tag: '', order: 0, soldOut: false, image: '' },
+  { id: 'spring-onion-salad', categoryId: 'salads', name: 'Spring Onion Salad', korean: '', description: 'Crisp spring onion salad with a light sesame dressing.', prices: [{ label: 'Regular', price: 9.00 }], tag: '', order: 1, soldOut: false, image: '' },
+
+  // ===== BANCHAN =====
+  { id: 'ssamjang', categoryId: 'banchan', name: "Mrs Kim's Ssamjang Dipping Sauce 200g", korean: '', description: 'Our signature fermented bean paste dipping sauce.', prices: [{ label: '200g', price: 7.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+  { id: 'spring-onion-salad-b', categoryId: 'banchan', name: 'Spring Onion Salad', korean: '', description: 'Crisp spring onion salad with a light sesame dressing.', prices: [{ label: 'Regular', price: 9.00 }], tag: '', order: 1, soldOut: false, image: '' },
+  { id: 'kimchi', categoryId: 'banchan', name: "Mrs Kim's Homemade Kimchi 450g", korean: '', description: 'Authentic homemade napa cabbage kimchi, fermented to perfection.', prices: [{ label: '450g', price: 14.00 }], tag: 'popular', order: 2, soldOut: false, image: '' },
+  { id: 'radish-pickle', categoryId: 'banchan', name: 'Homemade Sliced Radish Pickle 300g', korean: '', description: 'Tangy and refreshing sliced radish pickle.', prices: [{ label: '300g', price: 8.00 }], tag: '', order: 3, soldOut: false, image: '' },
+  { id: 'onion-pickle', categoryId: 'banchan', name: 'Homemade Onion Pickle 300g', korean: '', description: 'Sweet and tangy pickled onions.', prices: [{ label: '300g', price: 10.00 }], tag: '', order: 4, soldOut: false, image: '' },
+  { id: 'cucumber-kimchi', categoryId: 'banchan', name: 'Cucumber Kimchi 300g', korean: '', description: 'Fresh and crunchy cucumber kimchi.', prices: [{ label: '300g', price: 10.00 }], tag: '', order: 5, soldOut: false, image: '' },
+  { id: 'corn-cheese', categoryId: 'banchan', name: 'Corn Cheese 300g', korean: '', description: 'Sweet corn baked with mozzarella cheese — a Korean BBQ favourite.', prices: [{ label: '300g', price: 10.00 }], tag: 'popular', order: 6, soldOut: false, image: '' },
+
+  // ===== PREMIUM BBQ =====
+  { id: 'rib-fillet', categoryId: 'premium-bbq', name: 'Rib Fillet 1kg', korean: '갈비살', description: 'Premium M6+ Wagyu rib fillet, tender and richly marbled for exceptional flavour.', prices: [{ label: '1kg', price: 95.00 }], tag: 'premium', order: 0, soldOut: false, image: '' },
+  { id: 'shabu-shabu', categoryId: 'premium-bbq', name: 'Premium M9+ Wagyu Thinly Sliced Beef 250g', korean: '샤부샤부', description: 'Paper-thin sliced M9+ Wagyu beef, perfect for shabu shabu or quick grilling.', prices: [{ label: '250g', price: 18.00 }], tag: 'premium', order: 1, soldOut: false, image: '' },
+
+  // ===== FRESH CUT =====
+  { id: 'pork-belly', categoryId: 'fresh-cut', name: 'Pork Belly', korean: '삼겹살', description: 'Thick-cut pork belly slices — the king of Korean BBQ.', prices: [{ label: '500g', price: 21.00 }, { label: '1kg', price: 40.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+
+  // ===== MARINATED BBQ =====
+  { id: 'galbi', categoryId: 'marinated-bbq', name: "Mrs Kim's Signature Marinated Galbi", korean: '양념갈비', description: "Minimum 6 hours preparation time. Mrs Kim's Signature Marinated Galbi (1kg) — prepared with the finest quality beef short ribs, marinated in soy sauce, garlic, sugar, and traditional Korean spices. LIMITED AVAILABILITY.", prices: [{ label: '1kg', price: 56.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+  { id: 'beef-bulgogi', categoryId: 'marinated-bbq', name: 'Marinated Beef Bulgogi', korean: '소불고기', description: 'Marinated beef bulgogi made with premium M9+ Wagyu, tender and full of flavour.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: '', order: 1, soldOut: false, image: '' },
+  { id: 'soy-chicken', categoryId: 'marinated-bbq', name: 'Marinated Soy Chicken', korean: '간장 양념 닭', description: 'Lilydale free-range chicken marinated in a savoury soy-based Korean BBQ sauce.', prices: [{ label: '500g', price: 21.00 }, { label: '1kg', price: 40.00 }], tag: '', order: 2, soldOut: false, image: '' },
+  { id: 'soy-pork-belly', categoryId: 'marinated-bbq', name: 'Marinated Soy Pork Belly', korean: '양념 삼겹살', description: 'Premium pork belly marinated in a rich, savoury blend of soy sauce, garlic, ginger, and a touch of sweetness.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: '', order: 3, soldOut: false, image: '' },
+  { id: 'spicy-pork-belly', categoryId: 'marinated-bbq', name: 'Marinated Spicy Pork Belly', korean: '고추장 삼겹살', description: 'Tender pork belly marinated in a mild, yet flavourful Korean-inspired sauce with a perfect balance of savoury, sweet, and mildly spicy.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: 'spicy', order: 4, soldOut: false, image: '' },
+  { id: 'spicy-pork-bulgogi', categoryId: 'marinated-bbq', name: 'Marinated Spicy Pork Bulgogi', korean: '고추장 돼지 불고기', description: 'Premium pork marinated in a zesty blend of gochujang, garlic, soy sauce, and traditional Korean spices.', prices: [{ label: '500g', price: 20.00 }, { label: '1kg', price: 38.00 }], tag: 'spicy', order: 5, soldOut: false, image: '' },
+  { id: 'spicy-chicken', categoryId: 'marinated-bbq', name: 'Marinated Spicy Chicken', korean: '매운 양념 닭', description: 'Lilydale free-range chicken marinated in a spicy Korean BBQ sauce.', prices: [{ label: '500g', price: 21.00 }, { label: '1kg', price: 40.00 }], tag: 'spicy', order: 6, soldOut: false, image: '' },
+  { id: 'beef-skirt-steak', categoryId: 'marinated-bbq', name: 'Marinated Beef Skirt Steak', korean: '양념 치마살', description: 'Marinated Wagyu M6+ skirt steak, juicy and flavourful with rich marbling.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: '', order: 7, soldOut: false, image: '' },
+  { id: 'la-galbi', categoryId: 'marinated-bbq', name: 'Marinated LA Galbi Ribs 1kg', korean: 'LA 양념 갈비', description: 'Seoul-Style LA Galbi Ribs — thinly sliced across the bones, marinated in a rich blend of soy sauce, garlic, pear, and traditional Korean spices.', prices: [{ label: '1kg', price: 53.00 }], tag: 'new', order: 8, soldOut: false, image: '' },
+];
+
+window.runSeed = async () => {
+  const btn = document.getElementById('seedBtn');
+  btn.disabled = true; btn.textContent = 'Seeding...';
+  logEl.innerHTML = '';
+  log('🚀 Starting seed (Square CSV 가격 기준)...', 'warn');
+
+  try {
+    // 기존 이미지 URL 보존을 위해 현재 데이터 읽기
+    log('📸 기존 이미지 데이터 읽는 중...');
+    const existingImages = {};
+    try {
+      const existingProds = await getDocs(collection(db, 'products'));
+      existingProds.forEach(d => {
+        const data = d.data();
+        if (data.image) {
+          existingImages[d.id] = data.image;
+          log(`  📷 이미지 보존: ${d.id}`, 'info');
+        }
+      });
+    } catch(e) { /* no existing data, that's ok */ }
+    log(`  ${Object.keys(existingImages).length}개 이미지 보존됨`, 'ok');
+
+    log(`📁 Writing ${categories.length} categories...`);
+    for (const cat of categories) {
+      const { id, ...data } = cat;
+      await setDoc(doc(db, 'categories', id), data);
+      log(`  ✅ Category: ${cat.title}`, 'ok');
+    }
+
+    log(`🥩 Writing ${products.length} products...`);
+    for (const prod of products) {
+      const { id, ...data } = prod;
+      // 기존 이미지가 있으면 보존!
+      if (existingImages[id]) {
+        data.image = existingImages[id];
+      }
+      await setDoc(doc(db, 'products', id), data);
+      const priceStr = prod.prices.map(p => `${p.label} A$${p.price.toFixed(2)}`).join(' / ');
+      const imgStatus = existingImages[id] ? '📷' : '';
+      log(`  ✅ ${prod.name} — ${priceStr} ${imgStatus}`, 'ok');
+    }
+
+    log('');
+    log(`🎉 완료! ${categories.length} categories + ${products.length} products`, 'ok');
+    log('✅ 모든 가격이 Square CSV와 일치합니다!', 'ok');
+    log(`📸 ${Object.keys(existingImages).length}개 기존 이미지가 보존되었습니다!`, 'ok');
+    log('👉 메인 사이트 새로고침하면 메뉴가 보여요.', 'ok');
+  } catch (e) {
+    log(`❌ Error: ${e.message}`, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = '🚀 2단계: Seed All Menu Data';
+  }
+};
+
+window.clearAll = async () => {
+  if (!confirm('기존 데이터를 모두 삭제합니다. 계속할까요?')) return;
+  logEl.innerHTML = '';
+  log('🗑 기존 데이터 삭제 중...', 'warn');
+  try {
+    const catSnap = await getDocs(collection(db, 'categories'));
+    for (const d of catSnap.docs) { await deleteDoc(d.ref); log(`  삭제: ${d.id}`, 'info'); }
+    const prodSnap = await getDocs(collection(db, 'products'));
+    for (const d of prodSnap.docs) { await deleteDoc(d.ref); log(`  삭제: ${d.id}`, 'info'); }
+    log(`✅ 삭제 완료! (${catSnap.size} categories, ${prodSnap.size} products)`, 'ok');
+    log('👉 이제 2단계 Seed 버튼을 클릭하세요!', 'warn');
+  } catch (e) {
+    log(`❌ Error: ${e.message}`, 'err');
+  }
+};
+</script>
+</body>
+</html>

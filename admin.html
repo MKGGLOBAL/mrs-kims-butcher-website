@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mrs Kim's Grill — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #111; --bg2: #1a1a1a; --bg3: #222; --bg4: #2a2a2a;
+  --text: #f0f0f0; --text2: #999; --text3: #666;
+  --accent: #E85D3A; --accent2: #F06E4D;
+  --green: #27AE60; --red: #E74C3C; --gold: #C9A96E;
+  --border: #333; --radius: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* LOGIN */
+.login-page {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.login-box {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 40px; max-width: 400px; width: 100%; text-align: center;
+}
+.login-box h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+.login-box p { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+.google-btn {
+  width: 100%; padding: 14px 24px; font-family: inherit; font-size: 15px; font-weight: 600;
+  background: #fff; color: #333; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.2s;
+}
+.google-btn:hover { background: #f5f5f5; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.google-btn svg { flex-shrink: 0; }
+.login-error { color: var(--red); font-size: 13px; margin-top: 16px; display: none; }
+.access-denied {
+  background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 8px; padding: 16px; margin-top: 16px; display: none;
+}
+.access-denied p { color: var(--red); font-size: 13px; margin: 0; }
+.access-denied .denied-email { font-weight: 600; }
+
+/* ADMIN LAYOUT */
+.admin { display: none; }
+.admin.visible { display: block; }
+
+.admin-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; background: var(--bg2); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.admin-header h1 { font-size: 18px; font-weight: 600; }
+.admin-header h1 span { color: var(--accent); }
+.admin-header .header-actions { display: flex; gap: 10px; align-items: center; }
+.admin-user { font-size: 13px; color: var(--text2); }
+
+.btn {
+  padding: 8px 16px; font-family: inherit; font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: var(--bg3); color: var(--text); }
+.btn-secondary:hover { background: var(--bg4); }
+.btn-danger { background: transparent; color: var(--red); border-color: var(--red); }
+.btn-danger:hover { background: var(--red); color: #fff; }
+.btn-success { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-success:hover { opacity: 0.9; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-ghost { background: transparent; border: none; color: var(--text2); padding: 6px 10px; }
+.btn-ghost:hover { color: var(--text); }
+
+/* CONTENT */
+.admin-content { max-width: 1000px; margin: 0 auto; padding: 24px; }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--bg2); border-radius: 10px; padding: 4px; }
+.tab {
+  flex: 1; padding: 10px 16px; font-family: inherit; font-size: 13px; font-weight: 500;
+  background: transparent; border: none; color: var(--text2); border-radius: 8px; cursor: pointer; text-align: center;
+}
+.tab.active { background: var(--bg4); color: var(--text); }
+
+/* SEED BANNER */
+.seed-banner {
+  background: linear-gradient(135deg, rgba(232,93,58,0.1), rgba(201,169,110,0.1));
+  border: 1px solid rgba(232,93,58,0.3); border-radius: var(--radius);
+  padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.seed-banner-text h3 { font-size: 15px; margin-bottom: 4px; }
+.seed-banner-text p { font-size: 13px; color: var(--text2); }
+.seed-banner.hidden { display: none; }
+
+/* CATEGORY LIST */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-header h2 { font-size: 18px; font-weight: 600; }
+
+.cat-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 12px; overflow: hidden;
+}
+.cat-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer;
+}
+.cat-card-header:hover { background: var(--bg3); }
+.cat-card-title { font-size: 15px; font-weight: 600; }
+.cat-card-count { font-size: 12px; color: var(--text2); margin-left: 8px; }
+.cat-card-actions { display: flex; gap: 6px; }
+
+.cat-card-body { display: none; border-top: 1px solid var(--border); padding: 16px 20px; }
+.cat-card-body.open { display: block; }
+
+/* PRODUCT ROWS */
+.prod-row {
+  display: flex; align-items: center; gap: 14px; padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.prod-row:last-child { border-bottom: none; }
+.prod-thumb {
+  width: 56px; height: 56px; border-radius: 8px; background: var(--bg3);
+  overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.prod-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.prod-thumb-empty { font-size: 20px; opacity: 0.3; }
+.prod-info { flex: 1; min-width: 0; }
+.prod-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prod-meta { font-size: 12px; color: var(--text2); }
+.prod-price { font-size: 14px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.prod-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+.prod-tag {
+  display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 600;
+  border-radius: 100px; text-transform: uppercase; margin-left: 6px;
+}
+.prod-tag.popular { background: rgba(232,93,58,0.2); color: var(--accent); }
+.prod-tag.premium { background: rgba(201,169,110,0.2); color: var(--gold); }
+.prod-tag.spicy { background: rgba(192,57,43,0.2); color: #E74C3C; }
+.prod-tag.new { background: rgba(39,174,96,0.2); color: var(--green); }
+.prod-tag.soldout { background: rgba(255,255,255,0.1); color: var(--text3); }
+.prod-tag.best { background: rgba(39,174,96,0.2); color: var(--green); }
+.cat-hidden { opacity: 0.5; }
+.cat-hidden .cat-card-header { border-left: 3px solid var(--red); }
+.cat-hidden-badge { display: inline-block; background: var(--red); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-left: 8px; }
+.cat-reorder { display: flex; flex-direction: column; gap: 2px; }
+.reorder-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); width: 28px; height: 20px; font-size: 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.reorder-btn:hover:not(:disabled) { background: var(--primary); color: #fff; border-color: var(--primary); }
+.reorder-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* MEMBER ROWS */
+.member-row { display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+.member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.member-info { flex: 1; min-width: 0; }
+.member-name { font-weight: 600; font-size: 14px; }
+.member-email { font-size: 12px; color: var(--text3); }
+.member-phone { font-size: 12px; color: var(--text3); }
+.member-date { font-size: 11px; color: var(--text3); }
+.member-points { text-align: center; min-width: 80px; }
+.member-points-num { font-size: 24px; font-weight: 700; color: #C9A96E; }
+.member-points-label { font-size: 11px; color: var(--text3); }
+.member-actions { display: flex; gap: 6px; }
+.pts-btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; }
+.pts-btn-add { background: rgba(39,174,96,0.15); color: #27AE60; }
+.pts-btn-add:hover { background: rgba(39,174,96,0.3); }
+.pts-btn-sub { background: rgba(231,76,60,0.15); color: #E74C3C; }
+.pts-btn-sub:hover { background: rgba(231,76,60,0.3); }
+.pts-btn-history { background: rgba(201,169,110,0.15); color: #C9A96E; }
+.pts-btn-history:hover { background: rgba(201,169,110,0.3); }
+
+/* POINTS MODAL */
+.pts-modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
+.pts-modal-bg.open { display: flex; }
+.pts-modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 400px; }
+.pts-modal h3 { margin-bottom: 16px; }
+.pts-history-list { max-height: 300px; overflow-y: auto; margin-top: 12px; }
+.pts-history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.pts-history-item .pts-pos { color: #27AE60; font-weight: 600; }
+.pts-history-item .pts-neg { color: #E74C3C; font-weight: 600; }
+
+/* MODAL */
+.modal-bg {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px); z-index: 100; align-items: flex-start; justify-content: center;
+  padding: 40px 24px; overflow-y: auto;
+}
+.modal-bg.open { display: flex; }
+.modal-content {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+  max-width: 560px; width: 100%; padding: 28px; animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-content h2 { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%; padding: 10px 14px; font-family: inherit; font-size: 14px;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); outline: none;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-group select { appearance: none; cursor: pointer; }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+
+/* IMAGE UPLOAD */
+.img-upload-area {
+  border: 2px dashed var(--border); border-radius: 8px; padding: 24px;
+  text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
+}
+.img-upload-area:hover { border-color: var(--accent); background: rgba(232,93,58,0.05); }
+.img-upload-area.has-image { padding: 8px; }
+.img-upload-area img { max-width: 100%; max-height: 200px; border-radius: 6px; }
+.img-upload-area .upload-text { font-size: 13px; color: var(--text2); }
+.img-upload-area .upload-text strong { color: var(--accent); }
+.img-upload-area input[type="file"] { display: none; }
+.img-remove {
+  position: absolute; top: 12px; right: 12px;
+  width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.7);
+  border: none; color: #fff; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* PRICE ROWS */
+.price-rows { display: flex; flex-direction: column; gap: 8px; }
+.price-row { display: flex; gap: 8px; align-items: center; }
+.price-row input { flex: 1; }
+.price-row .btn-ghost { flex-shrink: 0; }
+
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* CHECK */
+.check-row { display: flex; align-items: center; gap: 10px; }
+.check-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+.check-row label { font-size: 14px; cursor: pointer; }
+
+/* STATUS */
+.status-bar {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+  padding: 12px 24px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 100px; font-size: 14px; font-weight: 500; z-index: 200;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); white-space: nowrap;
+}
+.status-bar.show { transform: translateX(-50%) translateY(0); }
+.status-bar.success { border-color: var(--green); }
+.status-bar.error { border-color: var(--red); }
+
+/* PROGRESS */
+.progress-bar { width: 100%; height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 8px; display: none; }
+.progress-bar.visible { display: block; }
+.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0; transition: width 0.3s; }
+
+@media (max-width: 600px) {
+  .admin-header { flex-direction: column; gap: 10px; }
+  .form-row { flex-direction: column; }
+  .prod-row { flex-wrap: wrap; }
+  .seed-banner { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h1>🔐 Admin Panel</h1>
+    <p>Mrs Kim's Grill — Menu Management</p>
+    <button class="google-btn" onclick="doGoogleLogin()">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="access-denied" id="accessDenied">
+      <p>⛔ Access denied for <span class="denied-email" id="deniedEmail"></span></p>
+      <p style="margin-top:8px;">Only authorised administrators can access this panel.</p>
+    </div>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin" id="adminPanel">
+  <header class="admin-header">
+    <h1>Mrs Kim's <span>Grill</span> — Admin</h1>
+    <div class="header-actions">
+      <span class="admin-user" id="adminUser"></span>
+      <button class="btn btn-secondary btn-sm" onclick="window.open('index.html','_blank')">👁 View Site</button>
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="admin-content">
+    <!-- SEED BANNER -->
+    <div class="seed-banner" id="seedBanner">
+      <div class="seed-banner-text">
+        <h3>🚀 Get Started</h3>
+        <p>Load all menu items from Mrs Kim's original menu into your database with one click.</p>
+      </div>
+      <button class="btn btn-success" onclick="seedData()" id="seedBtn">Seed Menu Data</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('categories',this)">📁 Categories</button>
+      <button class="tab" onclick="switchTab('products',this)">🥩 All Products</button>
+      <button class="tab" onclick="switchTab('members',this)">👥 Members</button>
+    </div>
+
+    <!-- CATEGORIES TAB -->
+    <div id="tab-categories">
+      <div class="section-header">
+        <h2>Categories</h2>
+        <button class="btn btn-primary btn-sm" onclick="openCategoryModal()">+ Add Category</button>
+      </div>
+      <div id="categoryList"></div>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div id="tab-products" style="display:none;">
+      <div class="section-header">
+        <h2>All Products</h2>
+        <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
+      </div>
+      <div id="allProductsList"></div>
+    </div>
+
+    <!-- MEMBERS TAB -->
+    <div id="tab-members" style="display:none;">
+      <div class="section-header">
+        <h2>Members <span id="memberCount" style="color:var(--text3);font-size:14px;"></span></h2>
+      </div>
+      <div id="membersList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-bg" id="catModal">
+  <div class="modal-content">
+    <h2 id="catModalTitle">Add Category</h2>
+    <input type="hidden" id="catEditId">
+    <div class="form-group">
+      <label>Category Title</label>
+      <input type="text" id="catTitle" placeholder="e.g. Marinated Korean BBQ">
+    </div>
+    <div class="form-group">
+      <label>Navigation Label (short name for menu bar)</label>
+      <input type="text" id="catNavLabel" placeholder="e.g. Marinated BBQ">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="catDesc" placeholder="Optional description shown below category title"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Display Order</label>
+      <input type="number" id="catOrder" value="0" min="0">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCatModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCategory()">Save Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="prodModal">
+  <div class="modal-content">
+    <h2 id="prodModalTitle">Add Product</h2>
+    <input type="hidden" id="prodEditId">
+
+    <div class="form-group">
+      <label>Product Image</label>
+      <div class="img-upload-area" id="imgUploadArea" onclick="document.getElementById('imgFile').click()">
+        <div class="upload-text" id="imgUploadText">
+          <p>📷 Click to upload image</p>
+          <p><strong>Browse</strong> or drag and drop</p>
+        </div>
+        <img id="imgPreview" style="display:none;">
+        <button class="img-remove" id="imgRemoveBtn" style="display:none;" onclick="event.stopPropagation();removeImage()">×</button>
+        <input type="file" id="imgFile" accept="image/*" onchange="previewImage(this)">
+      </div>
+      <div class="progress-bar" id="uploadProgress"><div class="progress-bar-fill" id="uploadProgressFill"></div></div>
+    </div>
+
+    <div class="form-group">
+      <label>Category</label>
+      <select id="prodCategory"></select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Product Name (English)</label>
+        <input type="text" id="prodName" placeholder="e.g. Marinated Beef Bulgogi">
+      </div>
+      <div class="form-group">
+        <label>Korean Name</label>
+        <input type="text" id="prodKorean" placeholder="e.g. 소불고기">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="prodDesc" placeholder="Product description..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Prices (add multiple for size options)</label>
+      <div class="price-rows" id="priceRows">
+        <div class="price-row">
+          <input type="text" placeholder="Label (e.g. 500g)" class="price-label">
+          <input type="number" placeholder="Price (AUD)" class="price-value" step="0.01" min="0">
+          <button class="btn-ghost" onclick="this.parentElement.remove()">🗑</button>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="addPriceRow()" style="margin-top:8px;">+ Add Price</button>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tag</label>
+        <select id="prodTag">
+          <option value="">None</option>
+          <option value="popular">🔥 Popular</option>
+          <option value="premium">⭐ Premium</option>
+          <option value="spicy">🌶 Spicy</option>
+          <option value="new">🆕 New</option>
+          <option value="best">💰 Best Value</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Display Order</label>
+        <input type="number" id="prodOrder" value="0" min="0">
+      </div>
+    </div>
+
+    <div class="check-row">
+      <input type="checkbox" id="prodSoldOut">
+      <label for="prodSoldOut">Mark as Sold Out</label>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeProdModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveProdBtn" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<!-- POINTS ADJUSTMENT MODAL -->
+<div class="pts-modal-bg" id="ptsModal">
+  <div class="pts-modal">
+    <h3 id="ptsModalTitle">Adjust Points</h3>
+    <input type="hidden" id="ptsUserId">
+    <div class="form-group">
+      <label>Amount</label>
+      <input type="number" id="ptsAmount" placeholder="e.g. 50" min="1">
+    </div>
+    <div class="form-group">
+      <label>Reason</label>
+      <input type="text" id="ptsReason" placeholder="e.g. Order #123 / Manual adjustment">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closePtsModal()">Cancel</button>
+      <button class="btn btn-primary" id="ptsSubmitBtn" onclick="submitPtsAdjust()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- POINTS HISTORY MODAL -->
+<div class="pts-modal-bg" id="ptsHistoryModal">
+  <div class="pts-modal">
+    <h3>Points History</h3>
+    <div class="pts-history-list" id="ptsHistoryList"></div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-secondary" onclick="document.getElementById('ptsHistoryModal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc, query, orderBy, writeBatch, updateDoc, arrayUnion, increment, Timestamp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-storage.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAmH7sqFbJjNXAlyKAz4Nzt-xnwvWsSvvw",
+  authDomain: "mrs-kim-s-butcher.firebaseapp.com",
+  projectId: "mrs-kim-s-butcher",
+  storageBucket: "mrs-kim-s-butcher.firebasestorage.app",
+  messagingSenderId: "850910143212",
+  appId: "1:850910143212:web:d9eeb4b0f006b3d14bbbc9",
+  measurementId: "G-1K9CCFTWFF"
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const googleProvider = new GoogleAuthProvider();
+
+// ===== ALLOWED ADMIN EMAILS =====
+const ALLOWED_ADMINS = ['chang.yoonho@gmail.com'];
+
+let categories = [];
+let products = [];
+let currentImageFile = null;
+let currentImageURL = null;
+
+// ===== AUTH =====
+onAuthStateChanged(auth, user => {
+  if (user) {
+    if (!ALLOWED_ADMINS.includes(user.email)) {
+      // Not authorised — show denied message and sign out
+      document.getElementById('accessDenied').style.display = 'block';
+      document.getElementById('deniedEmail').textContent = user.email;
+      document.getElementById('loginPage').style.display = 'flex';
+      document.getElementById('adminPanel').classList.remove('visible');
+      signOut(auth);
+      return;
+    }
+    document.getElementById('accessDenied').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('visible');
+    document.getElementById('adminUser').textContent = user.email;
+    loadAll();
+  } else {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('adminPanel').classList.remove('visible');
+  }
+});
+
+window.doGoogleLogin = async () => {
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  document.getElementById('accessDenied').style.display = 'none';
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      errEl.textContent = e.message.replace('Firebase: ', '');
+      errEl.style.display = 'block';
+    }
+  }
+};
+
+window.doLogout = () => signOut(auth);
+
+// ===== LOAD DATA =====
+async function loadAll() {
+  try {
+    const catSnap = await getDocs(query(collection(db, 'categories'), orderBy('order')));
+    categories = [];
+    catSnap.forEach(d => categories.push({ id: d.id, ...d.data() }));
+
+    const prodSnap = await getDocs(query(collection(db, 'products'), orderBy('order')));
+    products = [];
+    prodSnap.forEach(d => products.push({ id: d.id, ...d.data() }));
+
+    // Show/hide seed banner — show if no products exist
+    document.getElementById('seedBanner').classList.toggle('hidden', products.length > 0);
+
+    renderCategories();
+    renderAllProducts();
+  } catch (e) {
+    console.error(e);
+    showStatus('Error loading data: ' + e.message, 'error');
+  }
+}
+
+// ===== TABS =====
+window.switchTab = (tab, btn) => {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-categories').style.display = tab === 'categories' ? 'block' : 'none';
+  document.getElementById('tab-products').style.display = tab === 'products' ? 'block' : 'none';
+  document.getElementById('tab-members').style.display = tab === 'members' ? 'block' : 'none';
+  if (tab === 'members') loadMembers();
+};
+
+// ===== RENDER CATEGORIES =====
+function renderCategories() {
+  const el = document.getElementById('categoryList');
+  if (!categories.length) { el.innerHTML = '<p style="color:var(--text3);padding:20px;text-align:center;">No categories yet. Seed data or add one manually.</p>'; return; }
+  el.innerHTML = categories.map((cat, idx) => {
+    const catProds = products.filter(p => p.categoryId === cat.id);
+    const isHidden = cat.hidden === true;
+    const isFirst = idx === 0;
+    const isLast = idx === categories.length - 1;
+    return `
+      <div class="cat-card ${isHidden ? 'cat-hidden' : ''}">
+        <div class="cat-card-header" onclick="toggleCat('${cat.id}')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="cat-reorder">
+              <button class="reorder-btn" onclick="event.stopPropagation();moveCat('${cat.id}',-1)" ${isFirst ? 'disabled' : ''}>▲</button>
+              <button class="reorder-btn" onclick="event.stopPropagation();moveCat('${cat.id}',1)" ${isLast ? 'disabled' : ''}>▼</button>
+            </div>
+            <div>
+              <span class="cat-card-title">${cat.title}</span>
+              <span class="cat-card-count">(${catProds.length} items)</span>
+              ${isHidden ? '<span class="cat-hidden-badge">숨김</span>' : ''}
+            </div>
+          </div>
+          <div class="cat-card-actions">
+            <button class="btn btn-sm ${isHidden ? 'btn-primary' : 'btn-secondary'}" onclick="event.stopPropagation();toggleCatVisibility('${cat.id}')" title="${isHidden ? 'Show' : 'Hide'}">${isHidden ? '👁 보이기' : '🙈 숨기기'}</button>
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openCategoryModal('${cat.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteCategory('${cat.id}')">Delete</button>
+            <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProductModal(null,'${cat.id}')">+ Product</button>
+          </div>
+        </div>
+        <div class="cat-card-body" id="catBody-${cat.id}">
+          ${catProds.length === 0 ? '<p style="color:var(--text3);font-size:13px;">No products in this category.</p>' :
+            catProds.map(p => renderProdRow(p)).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderProdRow(p) {
+  const prices = (p.prices || []).map(pr => `A$${pr.price.toFixed(2)}`).join(' / ');
+  const tagClass = p.soldOut ? 'soldout' : (p.tag || '');
+  const tagLabel = p.soldOut ? 'Sold Out' : p.tag ? p.tag.charAt(0).toUpperCase() + p.tag.slice(1) : '';
+  return `
+    <div class="prod-row">
+      <div class="prod-thumb">
+        ${p.image ? `<img src="${p.image}">` : '<span class="prod-thumb-empty">📷</span>'}
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">
+          ${p.name}
+          ${tagLabel ? `<span class="prod-tag ${tagClass}">${tagLabel}</span>` : ''}
+        </div>
+        <div class="prod-meta">${p.korean || ''} ${p.description ? '— ' + p.description.substring(0, 60) + '...' : ''}</div>
+      </div>
+      <div class="prod-price">${prices}</div>
+      <div class="prod-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openProductModal('${p.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Delete</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderAllProducts() {
+  const el = document.getElementById('allProductsList');
+  if (!products.length) { el.innerHTML = '<p style="color:var(--text3);padding:20px;text-align:center;">No products yet.</p>'; return; }
+  el.innerHTML = products.map(p => renderProdRow(p)).join('');
+}
+
+window.toggleCat = id => {
+  document.getElementById(`catBody-${id}`).classList.toggle('open');
+};
+
+window.moveCat = async (id, direction) => {
+  const idx = categories.findIndex(c => c.id === id);
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= categories.length) return;
+
+  // Swap in local array
+  [categories[idx], categories[newIdx]] = [categories[newIdx], categories[idx]];
+
+  // Update order values in Firestore
+  try {
+    for (let i = 0; i < categories.length; i++) {
+      categories[i].order = i;
+      await setDoc(doc(db, 'categories', categories[i].id), { order: i }, { merge: true });
+    }
+    renderCategories();
+    showStatus(`순서 변경됨`, 'success');
+  } catch(e) {
+    showStatus('Error: ' + e.message, 'error');
+  }
+};
+
+window.toggleCatVisibility = async (id) => {
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+  const newHidden = !cat.hidden;
+  try {
+    await setDoc(doc(db, 'categories', id), { hidden: newHidden }, { merge: true });
+    cat.hidden = newHidden;
+    renderCategories();
+    showStatus(newHidden ? `"${cat.title}" 숨김 처리됨 (고객에게 안 보임)` : `"${cat.title}" 다시 표시됨`, 'success');
+  } catch(e) {
+    showStatus('Error: ' + e.message, 'error');
+  }
+};
+
+// ===== CATEGORY MODAL =====
+window.openCategoryModal = (editId) => {
+  const isEdit = !!editId;
+  document.getElementById('catModalTitle').textContent = isEdit ? 'Edit Category' : 'Add Category';
+  document.getElementById('catEditId').value = editId || '';
+
+  if (isEdit) {
+    const cat = categories.find(c => c.id === editId);
+    document.getElementById('catTitle').value = cat.title || '';
+    document.getElementById('catNavLabel').value = cat.navLabel || '';
+    document.getElementById('catDesc').value = cat.description || '';
+    document.getElementById('catOrder').value = cat.order || 0;
+  } else {
+    document.getElementById('catTitle').value = '';
+    document.getElementById('catNavLabel').value = '';
+    document.getElementById('catDesc').value = '';
+    document.getElementById('catOrder').value = categories.length;
+  }
+  document.getElementById('catModal').classList.add('open');
+};
+
+window.closeCatModal = () => document.getElementById('catModal').classList.remove('open');
+
+window.saveCategory = async () => {
+  const editId = document.getElementById('catEditId').value;
+  const title = document.getElementById('catTitle').value.trim();
+  if (!title) { showStatus('Category title is required', 'error'); return; }
+
+  const data = {
+    title,
+    navLabel: document.getElementById('catNavLabel').value.trim() || title,
+    description: document.getElementById('catDesc').value.trim(),
+    order: parseInt(document.getElementById('catOrder').value) || 0,
+  };
+
+  try {
+    const id = editId || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+    await setDoc(doc(db, 'categories', id), data);
+    showStatus(editId ? 'Category updated!' : 'Category added!', 'success');
+    window.closeCatModal();
+    await loadAll();
+  } catch (e) {
+    showStatus('Error: ' + e.message, 'error');
+  }
+};
+
+window.deleteCategory = async (id) => {
+  const catProds = products.filter(p => p.categoryId === id);
+  if (catProds.length > 0) {
+    if (!confirm(`This category has ${catProds.length} products. Delete all?`)) return;
+    for (const p of catProds) await deleteDoc(doc(db, 'products', p.id));
+  } else {
+    if (!confirm('Delete this category?')) return;
+  }
+  await deleteDoc(doc(db, 'categories', id));
+  showStatus('Category deleted', 'success');
+  await loadAll();
+};
+
+// ===== PRODUCT MODAL =====
+window.openProductModal = (editId, defaultCatId) => {
+  const isEdit = !!editId;
+  document.getElementById('prodModalTitle').textContent = isEdit ? 'Edit Product' : 'Add Product';
+  document.getElementById('prodEditId').value = editId || '';
+  currentImageFile = null;
+  currentImageURL = null;
+
+  // Populate category dropdown
+  const sel = document.getElementById('prodCategory');
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.title}</option>`).join('');
+
+  if (isEdit) {
+    const p = products.find(x => x.id === editId);
+    sel.value = p.categoryId;
+    document.getElementById('prodName').value = p.name || '';
+    document.getElementById('prodKorean').value = p.korean || '';
+    document.getElementById('prodDesc').value = p.description || '';
+    document.getElementById('prodTag').value = p.tag || '';
+    document.getElementById('prodOrder').value = p.order || 0;
+    document.getElementById('prodSoldOut').checked = !!p.soldOut;
+
+    // Image
+    if (p.image) {
+      currentImageURL = p.image;
+      document.getElementById('imgPreview').src = p.image;
+      document.getElementById('imgPreview').style.display = 'block';
+      document.getElementById('imgUploadText').style.display = 'none';
+      document.getElementById('imgRemoveBtn').style.display = 'flex';
+      document.getElementById('imgUploadArea').classList.add('has-image');
+    } else {
+      resetImageUI();
+    }
+
+    // Prices
+    const priceRows = document.getElementById('priceRows');
+    priceRows.innerHTML = '';
+    (p.prices || []).forEach(pr => {
+      priceRows.innerHTML += `<div class="price-row"><input type="text" placeholder="Label" class="price-label" value="${pr.label}"><input type="number" placeholder="Price" class="price-value" step="0.01" min="0" value="${pr.price}"><button class="btn-ghost" onclick="this.parentElement.remove()">🗑</button></div>`;
+    });
+  } else {
+    if (defaultCatId) sel.value = defaultCatId;
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodKorean').value = '';
+    document.getElementById('prodDesc').value = '';
+    document.getElementById('prodTag').value = '';
+    document.getElementById('prodOrder').value = products.filter(p => p.categoryId === (defaultCatId || sel.value)).length;
+    document.getElementById('prodSoldOut').checked = false;
+    resetImageUI();
+    document.getElementById('priceRows').innerHTML = `<div class="price-row"><input type="text" placeholder="Label (e.g. 500g)" class="price-label"><input type="number" placeholder="Price (AUD)" class="price-value" step="0.01" min="0"><button class="btn-ghost" onclick="this.parentElement.remove()">🗑</button></div>`;
+  }
+
+  document.getElementById('prodModal').classList.add('open');
+};
+
+window.closeProdModal = () => { document.getElementById('prodModal').classList.remove('open'); resetImageUI(); };
+
+function resetImageUI() {
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgUploadText').style.display = 'block';
+  document.getElementById('imgRemoveBtn').style.display = 'none';
+  document.getElementById('imgUploadArea').classList.remove('has-image');
+  document.getElementById('imgFile').value = '';
+  document.getElementById('uploadProgress').classList.remove('visible');
+  currentImageFile = null;
+}
+
+window.previewImage = (input) => {
+  if (input.files && input.files[0]) {
+    currentImageFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('imgPreview').src = e.target.result;
+      document.getElementById('imgPreview').style.display = 'block';
+      document.getElementById('imgUploadText').style.display = 'none';
+      document.getElementById('imgRemoveBtn').style.display = 'flex';
+      document.getElementById('imgUploadArea').classList.add('has-image');
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+};
+
+window.removeImage = () => {
+  currentImageURL = null;
+  resetImageUI();
+};
+
+window.addPriceRow = () => {
+  document.getElementById('priceRows').innerHTML += `<div class="price-row"><input type="text" placeholder="Label (e.g. 1kg)" class="price-label"><input type="number" placeholder="Price (AUD)" class="price-value" step="0.01" min="0"><button class="btn-ghost" onclick="this.parentElement.remove()">🗑</button></div>`;
+};
+
+async function uploadImage(file, productId) {
+  return new Promise((resolve, reject) => {
+    const storageRef = ref(storage, `products/${productId}/${Date.now()}_${file.name}`);
+    const task = uploadBytesResumable(storageRef, file);
+    const progBar = document.getElementById('uploadProgress');
+    const progFill = document.getElementById('uploadProgressFill');
+    progBar.classList.add('visible');
+
+    task.on('state_changed',
+      snap => { progFill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%'; },
+      err => { progBar.classList.remove('visible'); reject(err); },
+      async () => {
+        progBar.classList.remove('visible');
+        const url = await getDownloadURL(task.snapshot.ref);
+        resolve(url);
+      }
+    );
+  });
+}
+
+window.saveProduct = async () => {
+  const editId = document.getElementById('prodEditId').value;
+  const name = document.getElementById('prodName').value.trim();
+  if (!name) { showStatus('Product name is required', 'error'); return; }
+
+  const btn = document.getElementById('saveProdBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    // Collect prices
+    const priceEls = document.querySelectorAll('#priceRows .price-row');
+    const prices = [];
+    priceEls.forEach(row => {
+      const label = row.querySelector('.price-label').value.trim();
+      const price = parseFloat(row.querySelector('.price-value').value);
+      if (label && !isNaN(price)) prices.push({ label, price });
+    });
+
+    const id = editId || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+
+    // Upload image if new file selected
+    let imageUrl = currentImageURL || '';
+    if (currentImageFile) {
+      imageUrl = await uploadImage(currentImageFile, id);
+    }
+
+    const data = {
+      categoryId: document.getElementById('prodCategory').value,
+      name,
+      korean: document.getElementById('prodKorean').value.trim(),
+      description: document.getElementById('prodDesc').value.trim(),
+      prices,
+      tag: document.getElementById('prodTag').value,
+      order: parseInt(document.getElementById('prodOrder').value) || 0,
+      soldOut: document.getElementById('prodSoldOut').checked,
+      image: imageUrl,
+    };
+
+    await setDoc(doc(db, 'products', id), data);
+    showStatus(editId ? 'Product updated!' : 'Product added!', 'success');
+    window.closeProdModal();
+    await loadAll();
+  } catch (e) {
+    showStatus('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Product';
+  }
+};
+
+window.deleteProduct = async (id) => {
+  if (!confirm('Delete this product?')) return;
+  try {
+    await deleteDoc(doc(db, 'products', id));
+    showStatus('Product deleted', 'success');
+    await loadAll();
+  } catch (e) { showStatus('Error: ' + e.message, 'error'); }
+};
+
+// ===== SEED DATA =====
+window.seedData = async () => {
+  const btn = document.getElementById('seedBtn');
+  if (!confirm('This will add all Mrs Kim\'s menu items to your database. Continue?')) return;
+  btn.disabled = true; btn.textContent = 'Seeding...';
+
+  const seedCategories = [
+    { id: 'bbq-boxes', title: "BBQ Boxes", navLabel: 'BBQ Boxes', description: 'Complete Korean BBQ kits — meats, banchan, and sauces bundled together. Just fire up the grill!', order: 0 },
+    { id: 'salads', title: "Mrs Kim's Salads", navLabel: 'Salads', description: 'Fresh accompaniments to complete your Korean BBQ experience.', order: 1 },
+    { id: 'banchan', title: "Mrs Kim's Banchan", navLabel: 'Banchan', description: 'Traditional Korean side dishes, handmade with love.', order: 2 },
+    { id: 'premium-bbq', title: 'Premium Korean BBQ', navLabel: 'Premium BBQ', description: 'Top-tier cuts for the ultimate grilling experience.', order: 3 },
+    { id: 'fresh-cut', title: 'Fresh Cut Korean BBQ', navLabel: 'Fresh Cut', description: 'Classic un-marinated cuts, freshly sliced for your grill.', order: 4 },
+    { id: 'marinated-bbq', title: 'Marinated Korean BBQ', navLabel: 'Marinated BBQ', description: 'Ready to grill — marinated with our signature Korean recipes.', order: 5 },
+  ];
+
+  const seedProducts = [
+    // BBQ BOXES
+    { id: 'date-night-box', categoryId: 'bbq-boxes', name: 'Date Night Box', korean: '커플 세트', description: 'Perfect for two. Includes marinated beef bulgogi, pork belly, kimchi, ssamjang dipping sauce, and ssam lettuce kit.', prices: [{ label: 'For 2', price: 63.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+    { id: 'family-bbq-box', categoryId: 'bbq-boxes', name: 'Family BBQ Box', korean: '가족 세트', description: 'Feed the whole family! Includes signature galbi, marinated soy chicken, pork belly, kimchi, corn cheese, ssamjang, and ssam lettuce kit.', prices: [{ label: 'For 4', price: 119.00 }], tag: 'best', order: 1, soldOut: false, image: '' },
+    { id: 'ultimate-box', categoryId: 'bbq-boxes', name: "Ultimate Mrs Kim's Box", korean: '프리미엄 세트', description: 'The full experience. Premium wagyu rib fillet, signature galbi, beef bulgogi, soy pork belly, all banchan sides included. A true Korean BBQ feast.', prices: [{ label: 'For 4-6', price: 209.00 }], tag: 'premium', order: 2, soldOut: false, image: '' },
+    { id: 'spicy-lovers-box', categoryId: 'bbq-boxes', name: 'Spicy Lovers Box', korean: '매운맛 세트', description: 'For those who like it hot! Spicy pork bulgogi, spicy chicken, kimchi, cucumber kimchi, and ssamjang.', prices: [{ label: 'For 2-3', price: 62.00 }], tag: 'spicy', order: 3, soldOut: false, image: '' },
+    { id: 'ssam-lettuce', categoryId: 'salads', name: 'Ssam Lettuce and Pickles', korean: '', description: 'Fresh lettuce leaves and assorted pickles, perfect for wrapping your BBQ.', prices: [{ label: 'Regular', price: 6.00 }], tag: '', order: 0, soldOut: false, image: '' },
+    { id: 'spring-onion-salad', categoryId: 'salads', name: 'Spring Onion Salad', korean: '', description: 'Crisp spring onion salad with a light sesame dressing.', prices: [{ label: 'Regular', price: 5.00 }], tag: '', order: 1, soldOut: false, image: '' },
+
+    { id: 'ssamjang', categoryId: 'banchan', name: "Mrs Kim's Ssamjang Dipping Sauce 200g", korean: '', description: 'Our signature fermented bean paste dipping sauce.', prices: [{ label: '200g', price: 7.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+    { id: 'spring-onion-salad-b', categoryId: 'banchan', name: 'Spring Onion Salad', korean: '', description: 'Crisp spring onion salad with a light sesame dressing.', prices: [{ label: 'Regular', price: 5.00 }], tag: '', order: 1, soldOut: false, image: '' },
+    { id: 'kimchi', categoryId: 'banchan', name: "Mrs Kim's Homemade Kimchi 400g", korean: '', description: 'Authentic homemade napa cabbage kimchi, fermented to perfection.', prices: [{ label: '400g', price: 14.00 }], tag: 'popular', order: 2, soldOut: false, image: '' },
+    { id: 'radish-pickle', categoryId: 'banchan', name: 'Homemade Sliced Radish Pickle 300g', korean: '', description: 'Tangy and refreshing sliced radish pickle.', prices: [{ label: '300g', price: 8.00 }], tag: '', order: 3, soldOut: false, image: '' },
+    { id: 'onion-pickle', categoryId: 'banchan', name: 'Homemade Onion Pickle 300g', korean: '', description: 'Sweet and tangy pickled onions.', prices: [{ label: '300g', price: 8.00 }], tag: '', order: 4, soldOut: false, image: '' },
+    { id: 'cucumber-kimchi', categoryId: 'banchan', name: 'Cucumber Kimchi 300g', korean: '', description: 'Fresh and crunchy cucumber kimchi.', prices: [{ label: '300g', price: 10.00 }], tag: '', order: 5, soldOut: false, image: '' },
+    { id: 'corn-cheese', categoryId: 'banchan', name: 'Corn Cheese 300g', korean: '', description: 'Sweet corn baked with mozzarella cheese — a Korean BBQ favourite.', prices: [{ label: '300g', price: 10.00 }], tag: 'popular', order: 6, soldOut: false, image: '' },
+
+    { id: 'rib-fillet', categoryId: 'premium-bbq', name: 'Rib Fillet 1kg', korean: '꽃등심', description: 'Top of premium MB4+ Wagyu rib fillet, tender and richly marbled for exceptional flavour.', prices: [{ label: '500g', price: 27.00 }, { label: '1kg', price: 49.00 }], tag: 'premium', order: 0, soldOut: false, image: '' },
+    { id: 'shabu-shabu', categoryId: 'premium-bbq', name: 'Premium MB4+ Wagyu Thinly Sliced Beef 200g', korean: '샤부샤부', description: 'Paper-thin sliced Wagyu beef, perfect for shabu shabu or quick grilling.', prices: [{ label: '200g', price: 18.00 }], tag: 'premium', order: 1, soldOut: false, image: '' },
+
+    { id: 'pork-belly', categoryId: 'fresh-cut', name: 'Pork Belly', korean: '삼겹살', description: 'Thick-cut pork belly slices — the king of Korean BBQ.', prices: [{ label: '500g', price: 27.00 }, { label: '1kg', price: 40.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+
+    { id: 'galbi', categoryId: 'marinated-bbq', name: "Mrs Kim's Signature Marinated Galbi", korean: '갈비', description: 'Minimum 6 hours preparation time. Indulge in Mrs Kim\'s Signature Marinated Galbi — a mouthwatering, succulent delight.', prices: [{ label: 'Regular', price: 34.00 }], tag: 'popular', order: 0, soldOut: false, image: '' },
+    { id: 'beef-bulgogi', categoryId: 'marinated-bbq', name: 'Marinated Beef Bulgogi', korean: '소불고기', description: 'Marinated beef (sirloin) made with premium MB4+ Wagyu, tender and full of flavour.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: '', order: 1, soldOut: false, image: '' },
+    { id: 'soy-chicken', categoryId: 'marinated-bbq', name: 'Marinated Soy Chicken', korean: '간장 양념 치킨', description: 'Lipstick-free range chicken marinated in a savoury soy-based Korean BBQ sauce.', prices: [{ label: '500g', price: 27.00 }, { label: '1kg', price: 40.00 }], tag: '', order: 2, soldOut: false, image: '' },
+    { id: 'soy-pork-belly', categoryId: 'marinated-bbq', name: 'Marinated Soy Pork Belly', korean: '간장 삼겹살', description: 'Indulge in the mouthwatering flavours of savoury soy pork belly — a tender and succulent Korean-inspired delight.', prices: [{ label: '500g', price: 23.00 }, { label: '1kg', price: 43.00 }], tag: '', order: 3, soldOut: false, image: '' },
+    { id: 'spicy-pork-belly', categoryId: 'marinated-bbq', name: 'Marinated Spicy Pork Belly', korean: '고추장 삼겹살', description: 'Bubbling, buttery pork belly marinated in a rich yet flavourful Korean-inspired sauce.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: 'spicy', order: 4, soldOut: true, image: '' },
+    { id: 'spicy-pork-bulgogi', categoryId: 'marinated-bbq', name: 'Marinated Spicy Pork Bulgogi', korean: '고추장 돼지 불고기', description: 'Indulge in the bold flavours of Korean spicy marinated pork — tantalising and fiery.', prices: [{ label: '500g', price: 18.00 }, { label: '1kg', price: 38.00 }], tag: 'spicy', order: 5, soldOut: true, image: '' },
+    { id: 'spicy-chicken', categoryId: 'marinated-bbq', name: 'Marinated Spicy Chicken', korean: '매운 양념 치킨', description: 'Lipstick-free range chicken marinated in a spicy Korean BBQ sauce.', prices: [{ label: '500g', price: 27.00 }, { label: '1kg', price: 34.00 }], tag: 'spicy', order: 6, soldOut: false, image: '' },
+    { id: 'beef-short-steak', categoryId: 'marinated-bbq', name: 'Marinated Beef Short Steak', korean: '양념 떡갈비', description: 'Marinated Wagyu mix — dark steak, juicy and flavourful with rich marbling.', prices: [{ label: '500g', price: 22.00 }, { label: '1kg', price: 42.00 }], tag: '', order: 7, soldOut: false, image: '' },
+    { id: 'la-galbi', categoryId: 'marinated-bbq', name: 'Marinated LA Galbi Ribs 1kg', korean: 'LA 갈비 1kg', description: 'Experience the irresistible taste of Seoul — our LA Galbi Ribs are meticulously prepared, a delicious Korean BBQ favourite.', prices: [{ label: '1kg', price: 33.00 }], tag: 'new', order: 8, soldOut: false, image: '' },
+  ];
+
+  try {
+    // Batch write categories
+    let batch = writeBatch(db);
+    seedCategories.forEach(cat => {
+      const { id, ...data } = cat;
+      batch.set(doc(db, 'categories', id), data);
+    });
+    await batch.commit();
+
+    // Batch write products (max 500 per batch)
+    batch = writeBatch(db);
+    seedProducts.forEach(prod => {
+      const { id, ...data } = prod;
+      batch.set(doc(db, 'products', id), data);
+    });
+    await batch.commit();
+
+    showStatus('✅ Menu data seeded successfully! All items added.', 'success');
+    await loadAll();
+  } catch (e) {
+    showStatus('Seed error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Seed Menu Data';
+  }
+};
+
+// ===== STATUS =====
+function showStatus(msg, type = 'success') {
+  const el = document.getElementById('statusBar');
+  el.textContent = msg;
+  el.className = 'status-bar show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ===== MEMBERS =====
+let members = [];
+let ptsAdjustType = 'add'; // 'add' or 'sub'
+
+async function loadMembers() {
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    members = [];
+    snap.forEach(d => members.push({ id: d.id, ...d.data() }));
+    members.sort((a, b) => (b.points || 0) - (a.points || 0));
+    renderMembers();
+  } catch(e) { console.error(e); showStatus('Error loading members', 'error'); }
+}
+
+function renderMembers() {
+  const el = document.getElementById('membersList');
+  document.getElementById('memberCount').textContent = `(${members.length}명)`;
+  if (!members.length) { el.innerHTML = '<p style="color:var(--text3);padding:20px;text-align:center;">No members yet.</p>'; return; }
+  el.innerHTML = members.map(m => {
+    const initial = (m.name || m.email || '?')[0].toUpperCase();
+    const date = m.createdAt?.toDate ? m.createdAt.toDate().toLocaleDateString('ko-KR') : '';
+    return `
+      <div class="member-row">
+        <div class="member-avatar">${initial}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name || 'Unknown'}</div>
+          <div class="member-email">${m.email || ''}</div>
+          ${m.phone ? `<div class="member-phone">📱 ${m.phone}</div>` : ''}
+          <div class="member-date">가입: ${date}</div>
+        </div>
+        <div class="member-points">
+          <div class="member-points-num">${m.points || 0}</div>
+          <div class="member-points-label">Points</div>
+        </div>
+        <div class="member-actions">
+          <button class="pts-btn pts-btn-add" onclick="openPtsModal('${m.id}','add')">+ 적립</button>
+          <button class="pts-btn pts-btn-sub" onclick="openPtsModal('${m.id}','sub')">- 차감</button>
+          <button class="pts-btn pts-btn-history" onclick="showPtsHistory('${m.id}')">내역</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.openPtsModal = (uid, type) => {
+  ptsAdjustType = type;
+  document.getElementById('ptsUserId').value = uid;
+  document.getElementById('ptsAmount').value = '';
+  document.getElementById('ptsReason').value = '';
+  const m = members.find(m => m.id === uid);
+  document.getElementById('ptsModalTitle').textContent = type === 'add'
+    ? `포인트 적립 — ${m?.name || ''}`
+    : `포인트 차감 — ${m?.name || ''}`;
+  document.getElementById('ptsSubmitBtn').textContent = type === 'add' ? '✅ 적립' : '➖ 차감';
+  document.getElementById('ptsSubmitBtn').style.background = type === 'add' ? '#27AE60' : '#E74C3C';
+  document.getElementById('ptsModal').classList.add('open');
+};
+
+window.closePtsModal = () => { document.getElementById('ptsModal').classList.remove('open'); };
+
+window.submitPtsAdjust = async () => {
+  const uid = document.getElementById('ptsUserId').value;
+  const amount = parseInt(document.getElementById('ptsAmount').value);
+  const reason = document.getElementById('ptsReason').value.trim() || (ptsAdjustType === 'add' ? 'Manual add' : 'Manual deduct');
+  if (!amount || amount <= 0) { showStatus('Please enter a valid amount', 'error'); return; }
+
+  const m = members.find(m => m.id === uid);
+  if (ptsAdjustType === 'sub' && m && amount > (m.points || 0)) {
+    showStatus(`Not enough points. Current: ${m.points}`, 'error'); return;
+  }
+
+  try {
+    const actualAmount = ptsAdjustType === 'add' ? amount : -amount;
+    const historyEntry = {
+      type: ptsAdjustType === 'add' ? 'earn' : 'redeem',
+      amount: actualAmount,
+      description: reason,
+      date: Timestamp.now()
+    };
+    await updateDoc(doc(db, 'users', uid), {
+      points: increment(actualAmount),
+      totalEarned: ptsAdjustType === 'add' ? increment(amount) : increment(0),
+      totalSpent: ptsAdjustType === 'sub' ? increment(amount) : increment(0),
+      pointsHistory: arrayUnion(historyEntry)
+    });
+    showStatus(`${ptsAdjustType === 'add' ? '적립' : '차감'} 완료: ${amount}P — ${m?.name || ''}`, 'success');
+    window.closePtsModal();
+    loadMembers();
+  } catch(e) { showStatus('Error: ' + e.message, 'error'); }
+};
+
+window.showPtsHistory = (uid) => {
+  const m = members.find(m => m.id === uid);
+  const history = m?.pointsHistory || [];
+  const el = document.getElementById('ptsHistoryList');
+  if (!history.length) { el.innerHTML = '<p style="color:var(--text3);text-align:center;">No history yet.</p>'; }
+  else {
+    // Sort by date descending
+    const sorted = [...history].sort((a, b) => {
+      const da = a.date?.toDate ? a.date.toDate() : new Date(0);
+      const db2 = b.date?.toDate ? b.date.toDate() : new Date(0);
+      return db2 - da;
+    });
+    el.innerHTML = `<p style="font-weight:600;margin-bottom:8px;">${m.name || m.email} — 현재 ${m.points || 0}P</p>` +
+      sorted.map(h => {
+        const date = h.date?.toDate ? h.date.toDate().toLocaleDateString('ko-KR') : '';
+        const isPos = h.amount > 0;
+        return `<div class="pts-history-item"><div><div>${h.description}</div><div style="font-size:11px;color:var(--text3);">${date}</div></div><div class="${isPos?'pts-pos':'pts-neg'}">${isPos?'+':''}${h.amount}P</div></div>`;
+      }).join('');
+  }
+  document.getElementById('ptsHistoryModal').classList.add('open');
+};
+</script>
+</body>
+</html>

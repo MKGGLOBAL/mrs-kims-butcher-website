@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mrs Kim's Grill — Premium Korean BBQ Delivered to Your Door | Melbourne</title>
+<meta name="description" content="Premium marinated Korean BBQ meats, ready to grill at home. 30+ years of tradition, no MSG, 100% Australian meat. Delivered across Melbourne.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0F0E0C;
+  --bg-secondary: #1A1815;
+  --bg-card: #211F1B;
+  --bg-card-hover: #2A2722;
+  --text-primary: #F5F0E8;
+  --text-secondary: #A69E90;
+  --text-muted: #6B6358;
+  --accent: #E85D3A;
+  --accent-hover: #F06E4D;
+  --accent-glow: rgba(232, 93, 58, 0.15);
+  --gold: #C9A96E;
+  --gold-dim: rgba(201, 169, 110, 0.12);
+  --border: rgba(201, 169, 110, 0.08);
+  --border-hover: rgba(201, 169, 110, 0.2);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* LOADING */
+.loading-screen { position: fixed; inset: 0; background: var(--bg-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; }
+.loading-screen.fade-out { opacity: 0; pointer-events: none; }
+.loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+.loading-text { font-family: var(--font-display); font-size: 18px; color: var(--text-muted); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* PROMO BANNER */
+.promo-banner {
+  background: linear-gradient(90deg, var(--accent), #D4432A);
+  padding: 10px 24px; text-align: center; font-size: 13px; font-weight: 600; color: #fff;
+  letter-spacing: 0.3px; position: relative;
+}
+.promo-banner a { color: #fff; text-decoration: underline; margin-left: 6px; }
+.promo-close { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 18px; }
+
+/* HERO */
+.hero {
+  position: relative; padding: 80px 24px 50px; text-align: center; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0%, rgba(232,93,58,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(201,169,110,0.05) 0%, transparent 50%), var(--bg-primary);
+}
+.hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.3; }
+.hero-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); padding: 8px 20px; border: 1px solid rgba(201,169,110,0.25); border-radius: 100px; margin-bottom: 28px; animation: fadeDown 0.8s ease; }
+.hero h1 { font-family: var(--font-display); font-size: clamp(48px, 8vw, 96px); font-weight: 400; line-height: 1; letter-spacing: -1px; margin-bottom: 8px; animation: fadeDown 0.8s ease 0.1s both; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub { font-family: var(--font-display); font-size: clamp(18px, 3vw, 26px); font-weight: 400; color: var(--text-secondary); letter-spacing: 1px; margin-bottom: 24px; animation: fadeDown 0.8s ease 0.2s both; }
+.hero-desc { max-width: 520px; margin: 0 auto 36px; font-size: 15px; line-height: 1.7; color: var(--text-muted); animation: fadeDown 0.8s ease 0.3s both; }
+.hero-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 600; letter-spacing: 0.5px; padding: 14px 32px; border: none; border-radius: 100px; cursor: pointer; transition: all 0.3s ease; animation: fadeDown 0.8s ease 0.4s both; text-decoration: none; }
+.hero-cta:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,93,58,0.3); }
+
+/* TRUST BADGES */
+.trust-bar {
+  background: var(--bg-secondary); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 24px; overflow: hidden;
+}
+.trust-inner {
+  max-width: 1000px; margin: 0 auto;
+  display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+}
+.trust-item { display: flex; align-items: center; gap: 12px; }
+.trust-icon { font-size: 28px; }
+.trust-text { font-size: 13px; font-weight: 600; color: var(--text-secondary); line-height: 1.3; }
+.trust-text span { display: block; font-size: 11px; font-weight: 400; color: var(--text-muted); }
+
+/* NAV */
+.sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,14,12,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+.nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-link { flex-shrink: 0; padding: 16px 18px; font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; letter-spacing: 0.3px; border-bottom: 2px solid transparent; transition: all 0.3s ease; white-space: nowrap; }
+.nav-link:hover, .nav-link.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+.cart-btn { flex-shrink: 0; margin-left: auto; display: flex; align-items: center; gap: 8px; padding: 8px 18px; background: var(--accent); color: #fff; font-family: var(--font-body); font-size: 13px; font-weight: 600; border: none; border-radius: 100px; cursor: pointer; }
+.cart-btn:hover { background: var(--accent-hover); }
+.cart-count { background: #fff; color: var(--accent); font-size: 11px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+/* MAIN */
+.main { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+.category-section { padding-top: 60px; }
+.category-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.category-title { font-family: var(--font-display); font-size: 32px; font-weight: 500; }
+.category-count { font-size: 13px; color: var(--text-muted); }
+.category-desc { font-size: 14px; color: var(--text-secondary); margin-top: -24px; margin-bottom: 28px; line-height: 1.6; }
+
+/* PRODUCT GRID */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all 0.4s ease; }
+.product-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-4px); box-shadow: var(--shadow); }
+.product-img-wrap { position: relative; width: 100%; aspect-ratio: 4/3; background: var(--bg-secondary); overflow: hidden; }
+.product-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.product-card:hover .product-img-wrap img { transform: scale(1.05); }
+.product-img-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); gap: 8px; }
+.product-img-placeholder svg { opacity: 0.3; }
+.product-img-placeholder span { font-size: 12px; opacity: 0.5; }
+.product-tag { position: absolute; top: 12px; left: 12px; padding: 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; border-radius: 100px; text-transform: uppercase; }
+.tag-popular { background: var(--accent); color: #fff; }
+.tag-premium { background: var(--gold); color: var(--bg-primary); }
+.tag-spicy { background: #C0392B; color: #fff; }
+.tag-new { background: #27AE60; color: #fff; }
+.tag-soldout { background: var(--text-muted); color: var(--bg-primary); }
+.tag-best { background: linear-gradient(135deg, var(--accent), #D4432A); color: #fff; }
+.product-info { padding: 20px; }
+.product-name { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 2px; line-height: 1.3; }
+.product-korean { font-size: 13px; color: var(--gold); margin-bottom: 8px; }
+.product-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.product-bottom { display: flex; align-items: center; justify-content: space-between; }
+.product-price { font-size: 18px; font-weight: 700; }
+.product-price .from { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+.product-price .save { font-size: 11px; font-weight: 600; color: #27AE60; display: block; }
+.add-btn { display: flex; align-items: center; gap: 6px; padding: 10px 20px; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(232,93,58,0.2); border-radius: 100px; cursor: pointer; transition: all 0.3s ease; }
+.add-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.add-btn.soldout { color: var(--text-muted); background: transparent; border-color: var(--border); cursor: not-allowed; }
+
+/* ===== STORY SECTION ===== */
+.story-section {
+  max-width: 900px; margin: 0 auto; padding: 80px 24px;
+  text-align: center;
+}
+.story-divider {
+  width: 60px; height: 2px; background: var(--gold); margin: 0 auto 24px; opacity: 0.5;
+}
+.story-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+.story-title {
+  font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); font-weight: 400;
+  line-height: 1.2; margin-bottom: 24px;
+}
+.story-title em { font-style: italic; color: var(--accent); }
+.story-text {
+  font-size: 15px; line-height: 1.9; color: var(--text-secondary); max-width: 700px; margin: 0 auto;
+}
+.story-text p { margin-bottom: 16px; }
+.story-highlights {
+  display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 36px;
+}
+.story-stat {
+  text-align: center;
+}
+.story-stat-num {
+  font-family: var(--font-display); font-size: 40px; font-weight: 600; color: var(--accent);
+  line-height: 1;
+}
+.story-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== DELIVERY INFO ===== */
+.delivery-section {
+  background: var(--bg-secondary); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 60px 24px;
+}
+.delivery-inner {
+  max-width: 1000px; margin: 0 auto;
+}
+.delivery-title {
+  font-family: var(--font-display); font-size: 28px; font-weight: 500; text-align: center; margin-bottom: 36px;
+}
+.delivery-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;
+}
+.delivery-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; text-align: center;
+}
+.delivery-card-icon { font-size: 32px; margin-bottom: 12px; }
+.delivery-card-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.delivery-card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ===== REVIEWS ===== */
+.reviews-section {
+  padding: 80px 24px; max-width: 1000px; margin: 0 auto;
+}
+.reviews-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); text-align: center; margin-bottom: 12px;
+}
+.reviews-title {
+  font-family: var(--font-display); font-size: clamp(24px, 4vw, 36px); font-weight: 400;
+  text-align: center; margin-bottom: 8px;
+}
+.reviews-rating { text-align: center; margin-bottom: 36px; }
+.reviews-stars { font-size: 20px; color: #F39C12; letter-spacing: 2px; }
+.reviews-avg { font-size: 14px; color: var(--text-muted); margin-left: 8px; }
+.reviews-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+}
+.review-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; position: relative;
+}
+.review-quote {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.7;
+  font-style: italic; margin-bottom: 16px;
+}
+.review-quote::before { content: '"'; font-family: var(--font-display); font-size: 48px; color: var(--accent); opacity: 0.3; position: absolute; top: 12px; left: 16px; }
+.review-author { font-size: 13px; font-weight: 600; }
+.review-source { font-size: 12px; color: var(--text-muted); }
+
+/* ===== EMAIL POPUP ===== */
+.popup-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px); z-index: 3000; align-items: center; justify-content: center; padding: 24px;
+}
+.popup-overlay.open { display: flex; }
+.popup-box {
+  background: var(--bg-card); border: 1px solid var(--border-hover); border-radius: 16px;
+  max-width: 420px; width: 100%; padding: 36px; text-align: center; position: relative;
+  animation: modalIn 0.3s ease;
+}
+.popup-close {
+  position: absolute; top: 14px; right: 14px; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 50%;
+  cursor: pointer; color: var(--text-muted); font-size: 16px;
+}
+.popup-close:hover { color: var(--text-primary); }
+.popup-emoji { font-size: 48px; margin-bottom: 12px; }
+.popup-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; margin-bottom: 8px; }
+.popup-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+.popup-form { display: flex; gap: 8px; }
+.popup-input {
+  flex: 1; padding: 12px 16px; font-family: var(--font-body); font-size: 14px;
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-primary); outline: none;
+}
+.popup-input:focus { border-color: var(--accent); }
+.popup-submit {
+  padding: 12px 20px; font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap;
+}
+.popup-submit:hover { background: var(--accent-hover); }
+.popup-note { font-size: 11px; color: var(--text-muted); margin-top: 12px; }
+
+/* MODAL, CART, TOAST (same as before) */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg-card); border: 1px solid var(--border-hover); border-radius: 16px; max-width: 440px; width: 100%; padding: 32px; animation: modalIn 0.3s ease; }
+.modal-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+.modal-korean { font-size: 14px; color: var(--gold); margin-bottom: 20px; }
+.size-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.size-option { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s ease; }
+.size-option:hover, .size-option.selected { border-color: var(--accent); background: var(--accent-glow); }
+.size-option .size-name { font-size: 14px; font-weight: 500; }
+.size-option .size-price { font-size: 16px; font-weight: 700; color: var(--accent); }
+.modal-actions { display: flex; gap: 10px; }
+.modal-cancel { flex: 1; padding: 12px; font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text-secondary); background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+.modal-add { flex: 2; padding: 12px; font-family: var(--font-body); font-size: 14px; font-weight: 600; color: #fff; background: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; }
+.modal-add:hover { background: var(--accent-hover); }
+
+.cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; }
+.cart-overlay.open { display: block; }
+.cart-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 90vw; height: 100vh; background: var(--bg-secondary); border-left: 1px solid var(--border); z-index: 1000; display: flex; flex-direction: column; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.cart-drawer.open { right: 0; }
+.cart-header { display: flex; align-items: center; justify-content: space-between; padding: 24px; border-bottom: 1px solid var(--border); }
+.cart-header h3 { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+.cart-close { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 50%; cursor: pointer; color: var(--text-secondary); font-size: 18px; }
+.cart-close:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.cart-items { flex: 1; overflow-y: auto; padding: 16px 24px; }
+.cart-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.cart-empty svg { margin-bottom: 16px; opacity: 0.3; }
+.cart-item { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.cart-item-size { font-size: 12px; color: var(--text-muted); }
+.cart-item-price { font-size: 15px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+.cart-item-qty { display: flex; align-items: center; gap: 8px; }
+.qty-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 16px; font-weight: 600; }
+.qty-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.qty-val { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+.cart-footer { padding: 24px; border-top: 1px solid var(--border); }
+.cart-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.cart-total-label { font-size: 14px; color: var(--text-secondary); }
+.cart-total-price { font-size: 24px; font-weight: 700; }
+.checkout-btn { width: 100%; padding: 16px; font-family: var(--font-body); font-size: 15px; font-weight: 600; color: #fff; background: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; }
+.checkout-btn:hover { background: var(--accent-hover); }
+
+/* FOOTER */
+.site-footer { border-top: 1px solid var(--border); padding: 60px 24px 40px; }
+.footer-inner { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+.footer-brand-name { font-family: var(--font-display); font-size: 28px; font-weight: 500; margin-bottom: 12px; }
+.footer-brand-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+.footer-social { display: flex; gap: 12px; }
+.footer-social a {
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 50%;
+  color: var(--text-secondary); text-decoration: none; font-size: 16px; transition: all 0.2s;
+}
+.footer-social a:hover { border-color: var(--accent); color: var(--accent); }
+.footer-col h4 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 16px; }
+.footer-col a { display: block; font-size: 14px; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom { text-align: center; padding-top: 24px; border-top: 1px solid var(--border); max-width: 1000px; margin: 0 auto; }
+.footer-copy { font-size: 12px; color: var(--text-muted); }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); padding: 14px 28px; background: var(--bg-card); border: 1px solid var(--accent); border-radius: 100px; font-size: 14px; font-weight: 500; box-shadow: 0 12px 40px rgba(0,0,0,0.4); z-index: 2000; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.error-state { text-align: center; padding: 80px 24px; }
+.error-state h2 { font-family: var(--font-display); font-size: 28px; margin-bottom: 12px; }
+.error-state p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+.error-state button { padding: 12px 28px; font-family: var(--font-body); font-size: 14px; font-weight: 600; color: #fff; background: var(--accent); border: none; border-radius: 100px; cursor: pointer; }
+
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+  .hero { padding: 60px 20px 40px; }
+  .trust-inner { gap: 20px; }
+  .trust-item { flex: 1 1 140px; }
+  .category-section { padding-top: 40px; }
+  .category-title { font-size: 26px; }
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .product-info { padding: 16px; }
+  .product-name { font-size: 17px; }
+  .product-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .add-btn { width: 100%; justify-content: center; }
+  .footer-inner { grid-template-columns: 1fr; gap: 30px; }
+  .story-highlights { gap: 20px; }
+  .delivery-grid { grid-template-columns: 1fr 1fr; }
+  .popup-form { flex-direction: column; }
+}
+@media (max-width: 480px) {
+  .product-grid { grid-template-columns: 1fr; }
+  .delivery-grid { grid-template-columns: 1fr; }
+}
+
+/* AUTH MODAL */
+.auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.auth-overlay.open { display: flex; }
+.auth-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); width: 90%; max-width: 420px; padding: 32px; position: relative; }
+.auth-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+.auth-title { font-family: var(--font-display); font-size: 26px; color: var(--text-primary); margin-bottom: 4px; }
+.auth-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+.auth-tabs { display: flex; gap: 0; margin-bottom: 24px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+.auth-tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; background: var(--bg-card); color: var(--text-muted); border: none; cursor: pointer; transition: all 0.2s; }
+.auth-tab.active { background: var(--accent); color: #fff; }
+.auth-field { margin-bottom: 14px; }
+.auth-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.auth-field input { width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 15px; outline: none; }
+.auth-field input:focus { border-color: var(--accent); }
+.auth-submit { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+.auth-submit:hover { background: var(--accent-hover); }
+.auth-submit:disabled { background: var(--text-muted); cursor: not-allowed; }
+.auth-error { color: #E74C3C; font-size: 13px; margin-top: 8px; text-align: center; }
+.auth-bonus { background: var(--gold-dim); border: 1px solid rgba(201,169,110,0.2); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; text-align: center; font-size: 13px; color: var(--gold); }
+.auth-bonus strong { color: var(--text-primary); }
+
+/* USER NAV BUTTON */
+.user-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.user-btn:hover { border-color: var(--gold); color: var(--gold); }
+.user-btn .points-badge { background: var(--gold); color: #0F0E0C; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+/* USER PROFILE DROPDOWN */
+.user-dropdown { position: relative; }
+.user-menu { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 0; min-width: 220px; z-index: 100; box-shadow: var(--shadow); }
+.user-menu.open { display: block; }
+.user-menu-header { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.user-menu-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+.user-menu-email { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.user-menu-points { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.user-menu-points .pts-num { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--gold); }
+.user-menu-points .pts-label { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
+.user-menu-item { display: block; width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+.user-menu-item:hover { background: var(--bg-card); color: var(--text-primary); }
+.user-menu-item.logout { color: #E74C3C; }
+</style>
+</head>
+<body>
+
+<!-- PROMO BANNER -->
+<div class="promo-banner" id="promoBanner">
+  🔥 First Order? Get <strong>10% OFF</strong> — Use code <strong>KIMBBQ10</strong> at checkout
+  <button class="promo-close" onclick="this.parentElement.style.display='none'">&times;</button>
+</div>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading menu...</div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Melbourne's Korean BBQ Butcher</div>
+  <h1>Mrs Kim's <em>Grill</em></h1>
+  <p class="hero-sub">Takeaway Butcher</p>
+  <p class="hero-desc">Premium marinated Korean BBQ meats, ready to grill at home. Handcrafted with authentic recipes passed down over 30 years, delivered to your door across Melbourne.</p>
+  <a href="#menu" class="hero-cta">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Order Now
+  </a>
+</section>
+
+<!-- TRUST BADGES -->
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-item"><span class="trust-icon">🇦🇺</span><div class="trust-text">100% Australian Meat<span>Locally sourced, premium quality</span></div></div>
+    <div class="trust-item"><span class="trust-icon">🚫</span><div class="trust-text">No MSG, No Preservatives<span>Traditional recipes only</span></div></div>
+    <div class="trust-item"><span class="trust-icon">⏰</span><div class="trust-text">12+ Hours Marinated<span>Slow-marinated for deep flavour</span></div></div>
+    <div class="trust-item"><span class="trust-icon">👩‍🍳</span><div class="trust-text">30+ Years of Tradition<span>Since Mrs Kim started in Melbourne</span></div></div>
+  </div>
+</div>
+
+<!-- STICKY NAV -->
+<nav class="sticky-nav" id="menu">
+  <div class="nav-inner" id="navInner">
+    <div class="user-dropdown" id="userDropdown">
+      <button class="user-btn" id="userBtn" onclick="toggleUserMenu()">👤 Login</button>
+      <div class="user-menu" id="userMenu">
+        <div class="user-menu-header">
+          <div class="user-menu-name" id="menuUserName"></div>
+          <div class="user-menu-email" id="menuUserEmail"></div>
+        </div>
+        <div class="user-menu-points">
+          <div class="pts-num" id="menuUserPoints">0</div>
+          <div class="pts-label">Points<br><span style="color:var(--gold);font-size:11px;">$1 = 1pt · 100pt = $5</span></div>
+        </div>
+        <button class="user-menu-item logout" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+  </div>
+</nav>
+
+<!-- MENU -->
+<main class="main" id="menuContent"></main>
+
+<!-- STORY SECTION -->
+<section class="story-section reveal" id="story">
+  <div class="story-divider"></div>
+  <div class="story-label">Our Story</div>
+  <h2 class="story-title">From Mrs Kim's <em>Kitchen</em> to Your Home</h2>
+  <div class="story-text">
+    <p>Over 30 years ago, Mrs Kim — a Korean migrant — began marinating meats for home barbecues and community gatherings in Melbourne. With nostalgia for the flavours she grew up with and a dedication to traditional methods, what started as shared meals between friends became a beloved Melbourne institution.</p>
+    <p>Today, we bring that same tradition to your home. Every cut is marinated using Mrs Kim's original recipes — no shortcuts, no preservatives, no MSG. Just honest, authentic Korean BBQ made with 100% Australian meat, exactly the way Mrs Kim has always done it.</p>
+  </div>
+  <div class="story-highlights">
+    <div class="story-stat"><div class="story-stat-num">30+</div><div class="story-stat-label">Years of Tradition</div></div>
+    <div class="story-stat"><div class="story-stat-num">1</div><div class="story-stat-label">Restaurant Location</div></div>
+    <div class="story-stat"><div class="story-stat-num">12h</div><div class="story-stat-label">Minimum Marination</div></div>
+    <div class="story-stat"><div class="story-stat-num">4.6</div><div class="story-stat-label">★ Average Rating</div></div>
+  </div>
+</section>
+
+<!-- DELIVERY INFO -->
+<section class="delivery-section reveal">
+  <div class="delivery-inner">
+    <h2 class="delivery-title">How It Works</h2>
+    <div class="delivery-grid">
+      <div class="delivery-card">
+        <div class="delivery-card-icon">🛒</div>
+        <div class="delivery-card-title">1. Choose Your Meats</div>
+        <div class="delivery-card-desc">Pick from our range of premium cuts, marinated meats, banchan, and ready-to-grill BBQ boxes.</div>
+      </div>
+      <div class="delivery-card">
+        <div class="delivery-card-icon">🚚</div>
+        <div class="delivery-card-title">2. We Deliver Fresh</div>
+        <div class="delivery-card-desc">Delivered chilled across Melbourne metro. Refrigerated transport keeps everything fresh to your door.</div>
+      </div>
+      <div class="delivery-card">
+        <div class="delivery-card-icon">🔥</div>
+        <div class="delivery-card-title">3. Fire Up the Grill</div>
+        <div class="delivery-card-desc">Ready to cook — just throw it on the grill, pan, or BBQ. Restaurant-quality Korean BBQ at home in minutes.</div>
+      </div>
+      <div class="delivery-card">
+        <div class="delivery-card-icon">❄️</div>
+        <div class="delivery-card-title">Storage Info</div>
+        <div class="delivery-card-desc">Marinated meats keep 5–7 days refrigerated. All items can be frozen for up to 3 months.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section reveal">
+  <div class="reviews-label">What Our Customers Say</div>
+  <h2 class="reviews-title">Loved by Melbourne</h2>
+  <div class="reviews-rating">
+    <span class="reviews-stars">★★★★★</span>
+    <span class="reviews-avg">4.6 / 5 from 500+ reviews</span>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <p class="review-quote">Always absolutely fantastic. 10/10 experience, highly recommend. The marinated meats are incredible.</p>
+      <div class="review-author">Verified Diner</div>
+      <div class="review-source">OpenTable</div>
+    </div>
+    <div class="review-card">
+      <p class="review-quote">Deliciously marinated meats. Well worth it. Not much smoke from the BBQ either — perfect for home grilling.</p>
+      <div class="review-author">Verified Reviewer</div>
+      <div class="review-source">TripAdvisor</div>
+    </div>
+    <div class="review-card">
+      <p class="review-quote">Had the butchers cut set menu, absolutely wonderful. The kimchi is to die for. We keep coming back every week.</p>
+      <div class="review-author">Verified Diner</div>
+      <div class="review-source">OpenTable</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">Mrs Kim's Grill</div>
+      <p class="footer-brand-desc">Premium Korean BBQ meats, marinated with 30+ years of tradition. No MSG, no preservatives — just authentic flavours delivered to your door across Melbourne.</p>
+      <div class="footer-social">
+        <a href="#" title="Instagram">📸</a>
+        <a href="#" title="Facebook">📘</a>
+        <a href="#" title="TikTok">🎵</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Menu</h4>
+      <a href="#menu">BBQ Boxes</a>
+      <a href="#menu">Marinated Meats</a>
+      <a href="#menu">Premium Cuts</a>
+      <a href="#menu">Banchan & Sides</a>
+    </div>
+    <div class="footer-col">
+      <h4>Info</h4>
+      <a href="#story">Our Story</a>
+      <a href="#">Catering & Events</a>
+      <a href="#">Contact Us</a>
+      <a href="#">Delivery Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">&copy; 2026 Mrs Kim's Grill. All rights reserved. | Carnegie, Melbourne</p>
+  </div>
+</footer>
+
+<!-- SIZE MODAL -->
+<div class="modal-overlay" id="sizeModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-korean" id="modalKorean"></div>
+    <div class="size-options" id="sizeOptions"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-add" onclick="confirmAdd()">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header"><h3>Your Cart</h3><button class="cart-close" onclick="closeCart()">&times;</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span class="cart-total-label">Total</span><span class="cart-total-price" id="cartTotal">A$0.00</span></div>
+    <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- EMAIL POPUP -->
+<div class="popup-overlay" id="emailPopup">
+  <div class="popup-box">
+    <button class="popup-close" onclick="closePopup()">&times;</button>
+    <div class="popup-emoji">🥩🔥</div>
+    <div class="popup-title">Get 10% Off</div>
+    <p class="popup-desc">Join our mailing list for your first order discount, exclusive deals, and new menu alerts.</p>
+    <div class="popup-form">
+      <input type="email" class="popup-input" id="popupEmail" placeholder="Enter your email">
+      <button class="popup-submit" onclick="submitEmail()">Get Code</button>
+    </div>
+    <p class="popup-note">No spam, ever. Unsubscribe anytime.</p>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authModal">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuth()">&times;</button>
+    <div class="auth-title" id="authTitle">Welcome</div>
+    <div class="auth-sub" id="authSub">Sign up and earn points on every order!</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('register')" id="tabRegister">Register</button>
+      <button class="auth-tab" onclick="switchAuthTab('login')" id="tabLogin">Login</button>
+    </div>
+    <div id="registerForm">
+      <div class="auth-bonus">🎉 Sign up now and get <strong>100 bonus points (A$5 value)</strong>!</div>
+      <div class="auth-field"><label>Name</label><input type="text" id="regName" placeholder="Your name"></div>
+      <div class="auth-field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="regPassword" placeholder="Min 6 characters"></div>
+      <div class="auth-field"><label>Phone (optional)</label><input type="tel" id="regPhone" placeholder="04xx xxx xxx"></div>
+      <button class="auth-submit" onclick="doRegister()" id="regBtn">Create Account</button>
+    </div>
+    <div id="loginForm" style="display:none;">
+      <div class="auth-field"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="loginPassword" placeholder="Password"></div>
+      <button class="auth-submit" onclick="doLogin()" id="loginBtn">Sign In</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, doc, query, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAmH7sqFbJjNXAlyKAz4Nzt-xnwvWsSvvw",
+  authDomain: "mrs-kim-s-butcher.firebaseapp.com",
+  projectId: "mrs-kim-s-butcher",
+  storageBucket: "mrs-kim-s-butcher.firebasestorage.app",
+  messagingSenderId: "850910143212",
+  appId: "1:850910143212:web:d9eeb4b0f006b3d14bbbc9",
+  measurementId: "G-1K9CCFTWFF"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let menuData = [], cart = [], currentItem = null, selectedSizeIdx = 0, currentUser = null;
+
+// ===== LOAD MENU =====
+async function loadMenu() {
+  try {
+    const catSnap = await getDocs(query(collection(db, 'categories'), orderBy('order')));
+    const categories = [];
+    catSnap.forEach(doc => categories.push({ id: doc.id, ...doc.data(), items: [] }));
+    const prodSnap = await getDocs(query(collection(db, 'products'), orderBy('order')));
+    prodSnap.forEach(doc => { const d = doc.data(); const cat = categories.find(c => c.id === d.categoryId); if (cat) cat.items.push({ id: doc.id, ...d }); });
+    menuData = categories.filter(c => c.items.length > 0 && c.hidden !== true);
+    if (menuData.length === 0) { showError('Menu coming soon! Check back shortly.'); return; }
+    renderNav(); renderMenu(); hideLoading();
+  } catch (err) { console.error(err); showError('Could not load menu. Please try again.'); }
+}
+
+function showError(msg) { hideLoading(); document.getElementById('menuContent').innerHTML = `<div class="error-state"><h2>Oops!</h2><p>${msg}</p><button onclick="location.reload()">Retry</button></div>`; }
+function hideLoading() { const el = document.getElementById('loadingScreen'); el.classList.add('fade-out'); setTimeout(() => el.remove(), 500); }
+
+function renderNav() {
+  const nav = document.getElementById('navInner');
+  const userHTML = nav.querySelector('.user-dropdown').outerHTML;
+  const cartHTML = nav.querySelector('.cart-btn').outerHTML;
+  nav.innerHTML = menuData.map((c, i) => `<a href="#${c.id}" class="nav-link ${i===0?'active':''}">${c.navLabel || c.title}</a>`).join('') + userHTML + cartHTML;
+}
+
+function renderMenu() {
+  document.getElementById('menuContent').innerHTML = menuData.map(cat => `
+    <section class="category-section reveal" id="${cat.id}">
+      <div class="category-header">
+        <h2 class="category-title">${cat.title}</h2>
+        <span class="category-count">${cat.items.length} item${cat.items.length>1?'s':''}</span>
+      </div>
+      ${cat.description ? `<p class="category-desc">${cat.description}</p>` : ''}
+      <div class="product-grid">${cat.items.map(renderCard).join('')}</div>
+    </section>
+  `).join('');
+  observeReveal();
+}
+
+function renderCard(item) {
+  const prices = item.prices || [];
+  const priceDisplay = prices.length > 1
+    ? `<span class="from">from </span>A$${prices[0].price.toFixed(2)}`
+    : prices.length === 1 ? `A$${prices[0].price.toFixed(2)}` : '';
+  const tagHTML = item.soldOut ? '<span class="product-tag tag-soldout">Sold Out</span>'
+    : item.tag === 'popular' ? '<span class="product-tag tag-popular">Popular</span>'
+    : item.tag === 'premium' ? '<span class="product-tag tag-premium">Premium</span>'
+    : item.tag === 'spicy' ? '<span class="product-tag tag-spicy">🌶 Spicy</span>'
+    : item.tag === 'new' ? '<span class="product-tag tag-new">New</span>'
+    : item.tag === 'best' ? '<span class="product-tag tag-best">Best Value</span>' : '';
+  const imgHTML = item.image
+    ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+    : `<div class="product-img-placeholder"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Photo coming soon</span></div>`;
+  const safeData = encodeURIComponent(JSON.stringify(item));
+  const btnHTML = item.soldOut
+    ? `<button class="add-btn soldout" disabled>Sold Out</button>`
+    : `<button class="add-btn" data-item="${safeData}" onclick="window._addClick(this)"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Add</button>`;
+  return `<div class="product-card"><div class="product-img-wrap">${imgHTML}${tagHTML}</div><div class="product-info"><div class="product-name">${item.name}</div>${item.korean?`<div class="product-korean">${item.korean}</div>`:''}<p class="product-desc">${item.description||''}</p><div class="product-bottom"><div class="product-price">${priceDisplay}</div>${btnHTML}</div></div></div>`;
+}
+
+// ===== CART =====
+window._addClick = btn => { const item = JSON.parse(decodeURIComponent(btn.dataset.item)); if (item.prices?.length > 1) { openSizeModal(item); } else { addToCart(item, 0); showToast(`${item.name} added to cart`); } };
+function openSizeModal(item) { currentItem = item; selectedSizeIdx = 0; document.getElementById('modalTitle').textContent = item.name; document.getElementById('modalKorean').textContent = item.korean || ''; document.getElementById('sizeOptions').innerHTML = item.prices.map((p, i) => `<div class="size-option ${i===0?'selected':''}" onclick="window._selSize(${i})"><span class="size-name">${p.label}</span><span class="size-price">A$${p.price.toFixed(2)}</span></div>`).join(''); document.getElementById('sizeModal').classList.add('open'); }
+window._selSize = idx => { selectedSizeIdx = idx; document.querySelectorAll('.size-option').forEach((el,i)=>el.classList.toggle('selected',i===idx)); };
+window.closeModal = () => { document.getElementById('sizeModal').classList.remove('open'); currentItem = null; };
+window.confirmAdd = () => { if(currentItem){ addToCart(currentItem, selectedSizeIdx); showToast(`${currentItem.name} (${currentItem.prices[selectedSizeIdx].label}) added`); window.closeModal(); } };
+function addToCart(item, si) { const key = `${item.id}-${si}`, ex = cart.find(c=>c.key===key); if(ex) ex.qty++; else cart.push({key,id:item.id,name:item.name,size:item.prices[si].label,price:item.prices[si].price,qty:1}); updateCartUI(); }
+function updateCartUI() {
+  document.getElementById('cartCount').textContent = cart.reduce((s,c)=>s+c.qty,0);
+  const el = document.getElementById('cartItems');
+  if(!cart.length) { el.innerHTML = `<div class="cart-empty"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg><p>Your cart is empty</p></div>`; }
+  else { el.innerHTML = cart.map((c,i)=>`<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${c.name}</div><div class="cart-item-size">${c.size}</div><div class="cart-item-price">A$${(c.price*c.qty).toFixed(2)}</div></div><div class="cart-item-qty"><button class="qty-btn" onclick="window._chgQty(${i},-1)">&minus;</button><span class="qty-val">${c.qty}</span><button class="qty-btn" onclick="window._chgQty(${i},1)">+</button></div></div>`).join(''); }
+  document.getElementById('cartTotal').textContent = `A$${cart.reduce((s,c)=>s+c.price*c.qty,0).toFixed(2)}`;
+}
+window._chgQty = (i,d) => { cart[i].qty+=d; if(cart[i].qty<=0)cart.splice(i,1); updateCartUI(); };
+window.openCart = () => { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('open'); document.body.style.overflow='hidden'; };
+window.closeCart = () => { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('open'); document.body.style.overflow=''; };
+window.checkout = () => { if(!cart.length)return; showToast('Checkout feature coming soon!'); };
+
+// ===== EMAIL POPUP =====
+window.closePopup = () => { document.getElementById('emailPopup').classList.remove('open'); localStorage.setItem('popupDismissed', 'true'); };
+window.submitEmail = async () => {
+  const email = document.getElementById('popupEmail').value.trim();
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email'); return; }
+  try {
+    await addDoc(collection(db, 'subscribers'), { email, subscribedAt: Timestamp.now() });
+    showToast('🎉 Check your email for code KIMBBQ10!');
+    window.closePopup();
+  } catch(e) { showToast('Thanks! Use code KIMBBQ10'); window.closePopup(); }
+};
+// Show popup after 8 seconds if not dismissed
+setTimeout(() => {
+  if (!localStorage.getItem('popupDismissed')) {
+    document.getElementById('emailPopup').classList.add('open');
+  }
+}, 8000);
+
+// ===== UTILS =====
+function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
+function observeReveal() {
+  const obs = new IntersectionObserver(entries => entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+// Also observe static reveal sections
+document.addEventListener('DOMContentLoaded', () => {
+  const obs = new IntersectionObserver(entries => entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+});
+
+window.addEventListener('scroll', () => {
+  const links = document.querySelectorAll('.nav-link');
+  let cur = 0;
+  menuData.forEach((c,i)=>{const s=document.getElementById(c.id);if(s&&s.getBoundingClientRect().top<200)cur=i;});
+  links.forEach((l,i)=>l.classList.toggle('active',i===cur));
+});
+
+// ===== AUTH =====
+window.switchAuthTab = (tab) => {
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('authTitle').textContent = tab === 'register' ? 'Welcome' : 'Welcome Back';
+  document.getElementById('authSub').textContent = tab === 'register' ? 'Sign up and earn points on every order!' : 'Sign in to check your points.';
+  document.getElementById('authError').textContent = '';
+};
+window.closeAuth = () => { document.getElementById('authModal').classList.remove('open'); };
+window.toggleUserMenu = () => {
+  if (!currentUser) { document.getElementById('authModal').classList.add('open'); return; }
+  document.getElementById('userMenu').classList.toggle('open');
+};
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.user-dropdown')) document.getElementById('userMenu')?.classList.remove('open');
+});
+
+window.doRegister = async () => {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const phone = document.getElementById('regPhone').value.trim();
+  const errEl = document.getElementById('authError');
+  errEl.textContent = '';
+  if (!name) { errEl.textContent = 'Please enter your name.'; return; }
+  if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email.'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: name });
+    // Create user document with 100 bonus points
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email, phone,
+      points: 100,
+      totalEarned: 100,
+      totalSpent: 0,
+      createdAt: Timestamp.now(),
+      pointsHistory: [{
+        type: 'bonus',
+        amount: 100,
+        description: '회원가입 보너스 (Welcome Bonus)',
+        date: Timestamp.now()
+      }]
+    });
+    showToast('🎉 Welcome! 100 bonus points added!');
+    window.closeAuth();
+  } catch(e) {
+    const msg = e.code === 'auth/email-already-in-use' ? 'This email is already registered. Try logging in.'
+      : e.code === 'auth/weak-password' ? 'Password must be at least 6 characters.'
+      : e.message;
+    errEl.textContent = msg;
+  } finally { btn.disabled = false; btn.textContent = 'Create Account'; }
+};
+
+window.doLogin = async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.textContent = '';
+  if (!email) { errEl.textContent = 'Please enter your email.'; return; }
+  if (!password) { errEl.textContent = 'Please enter your password.'; return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    showToast('Welcome back!');
+    window.closeAuth();
+  } catch(e) {
+    const msg = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential'
+      ? 'Incorrect email or password.' : e.message;
+    errEl.textContent = msg;
+  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  document.getElementById('userMenu').classList.remove('open');
+  showToast('Signed out');
+};
+
+async function updateUserUI(user) {
+  const btn = document.getElementById('userBtn');
+  if (!user) {
+    currentUser = null;
+    btn.innerHTML = '👤 Login';
+    return;
+  }
+  currentUser = user;
+  let pts = 0;
+  try {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) pts = userDoc.data().points || 0;
+  } catch(e) {}
+  const name = user.displayName || 'Member';
+  btn.innerHTML = `👤 ${name.split(' ')[0]} <span class="points-badge">${pts}P</span>`;
+  document.getElementById('menuUserName').textContent = name;
+  document.getElementById('menuUserEmail').textContent = user.email;
+  document.getElementById('menuUserPoints').textContent = pts;
+}
+
+onAuthStateChanged(auth, (user) => { updateUserUI(user); });
+
+loadMenu();
+updateCartUI();
+</script>
+</body>
+</html>
